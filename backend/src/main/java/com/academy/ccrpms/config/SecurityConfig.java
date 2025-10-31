@@ -35,7 +35,8 @@ public class SecurityConfig {
             // 🔹 Cho phép public các endpoint auth
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/api/auth/**",   // ✅ cho phép đăng ký / đăng nhập
+                    "/api/auth/**",
+                    "/api/applications/**",  // ✅ Cho phép module Application để test
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
                 ).permitAll()
