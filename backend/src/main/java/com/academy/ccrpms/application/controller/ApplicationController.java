@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -17,16 +16,16 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     // Nộp hồ sơ
-    @PostMapping("/submit")
-    public ResponseEntity<Application> submit(@RequestBody Map<String, Object> request) {
-        Long userId = Long.parseLong(request.get("userId").toString());
-        String jobTitle = request.get("jobTitle").toString();
-
-        Application app = applicationService.submitApplication(userId, jobTitle);
+    @PostMapping("/submit/{userId}/{jobId}")
+    public ResponseEntity<Application> submit(
+            @PathVariable Long userId,
+            @PathVariable Long jobId
+    ) {
+        Application app = applicationService.submitApplication(userId, jobId);
         return ResponseEntity.ok(app);
     }
 
-    // Xem danh sách hồ sơ đã nộp
+    // Xem danh sách hồ sơ của ứng viên
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Application>> getUserApplications(@PathVariable Long userId) {
         return ResponseEntity.ok(applicationService.getApplicationsByUser(userId));

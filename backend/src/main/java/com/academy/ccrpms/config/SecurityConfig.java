@@ -38,7 +38,8 @@ public class SecurityConfig {
                     "/api/auth/**",
                     "/api/applications/**",  // ✅ Cho phép module Application để test
                     "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/api/jobs/**"  // ✅ Cho phép module Job để test
                 ).permitAll()
                 .anyRequest().authenticated()
             );

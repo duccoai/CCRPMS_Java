@@ -2,6 +2,7 @@ package com.academy.ccrpms.application.entity;
 
 import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.user.entity.User;
+import com.academy.ccrpms.job.entity.Job;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,16 +19,18 @@ public class Application extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người nộp hồ sơ (Ứng viên)
+    // Ứng viên nộp hồ sơ
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Tạm thời để text, sau này sẽ là entity Job
-    @Column(nullable = false)
-    private String jobTitle;
+    // Vị trí tuyển dụng
+    @ManyToOne
+    @JoinColumn(name = "job_id", nullable = false)
+    private Job job;
 
     // Trạng thái hồ sơ
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.PENDING;
 }
