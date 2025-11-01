@@ -30,6 +30,9 @@ public class Application extends BaseEntity {
     private Job job;
 
     // Trạng thái hồ sơ
+    @Builder.Default
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.PENDING;
+
 }

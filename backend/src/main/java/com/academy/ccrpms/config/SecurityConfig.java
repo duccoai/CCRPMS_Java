@@ -25,21 +25,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 🔹 Bật CORS và tắt CSRF
+            // 🔹 Cho phép CORS, tắt CSRF
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
 
-            // 🔹 Không dùng session để lưu state
+            // 🔹 Không dùng session (stateless)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // 🔹 Cho phép public các endpoint auth
+            // 🔹 Cho phép các endpoint public
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
-                    "/api/applications/**",  // ✅ Cho phép module Application để test
+                    "/api/jobs/**",
+                    "/api/applications/**",
+                    "/api/exams/**",     // ✅ thêm dòng này
                     "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/api/jobs/**"  // ✅ Cho phép module Job để test
+                    "/v3/api-docs/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
@@ -47,7 +48,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Cho phép tất cả origin, header, method để Postman không bị chặn
+    // ✅ Cho phép tất cả origin, headers, methods
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
