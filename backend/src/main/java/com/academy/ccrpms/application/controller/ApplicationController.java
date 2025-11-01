@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -30,4 +31,10 @@ public class ApplicationController {
     public ResponseEntity<List<Application>> getUserApplications(@PathVariable Long userId) {
         return ResponseEntity.ok(applicationService.getApplicationsByUser(userId));
     }
+
+    @GetMapping("/status/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getStatusByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(applicationService.getApplicationStatuses(userId));
+    }
+
 }

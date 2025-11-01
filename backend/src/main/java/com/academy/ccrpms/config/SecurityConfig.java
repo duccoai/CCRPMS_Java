@@ -38,12 +38,18 @@ public class SecurityConfig {
                     "/api/auth/**",
                     "/api/jobs/**",
                     "/api/applications/**",
-                    "/api/exams/**",     // ✅ thêm dòng này
+                    "/api/exams/**",
                     "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**",
+                    "/error",
+                    "/",
+                    "/favicon.ico"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
+
 
         return http.build();
     }
