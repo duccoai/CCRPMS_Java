@@ -37,4 +37,10 @@ public class ApplicationController {
         return ResponseEntity.ok(applicationService.getApplicationStatuses(userId));
     }
 
+    @GetMapping("/result/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getApplicationResults(@PathVariable Long userId) {
+        return ResponseEntity.ok(applicationService.getApplicationResults(userId));
+    }
+
+
 }
