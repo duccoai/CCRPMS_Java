@@ -22,6 +22,7 @@ public class ApplicationService {
 
     // Nộp hồ sơ ứng tuyển
     public Application submitApplication(Long userId, Long jobId) {
+        System.out.println(">>> SubmitApplication called for userId=" + userId + ", jobId=" + jobId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

@@ -2,6 +2,7 @@ package com.academy.ccrpms.job.entity;
 
 import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.application.entity.Application;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"applications"}) // ✅ ngăn serialize đệ quy
 public class Job extends BaseEntity {
 
     @Id
@@ -34,7 +36,7 @@ public class Job extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.OPEN;
 
-    // Danh sách hồ sơ ứng tuyển cho vị trí này
-    @OneToMany(mappedBy = "job")
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("job") // ✅ Ngăn serialize ngược từ application về job
     private List<Application> applications;
 }
