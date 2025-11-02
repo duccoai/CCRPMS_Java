@@ -10,26 +10,23 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false)
     private String password;
-
     private String email;
-
-    @Column(name = "full_name")
     private String fullName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
     private boolean active = true;
+
+    // 🟩 Thông tin hồ sơ bổ sung
+    private String avatarUrl; // ảnh đại diện
+    private String cvUrl;     // đường dẫn CV
+    @Column(length = 2000)
+    private String bio;       // mô tả cá nhân, giới thiệu ngắn
 }
