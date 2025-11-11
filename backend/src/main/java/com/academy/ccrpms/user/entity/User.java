@@ -1,5 +1,6 @@
 package com.academy.ccrpms.user.entity;
 
+import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,6 +14,10 @@ import lombok.*;
 @Builder
 public class User extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String username;
     private String password;
     private String email;
@@ -25,8 +30,8 @@ public class User extends BaseEntity {
     private boolean active = true;
 
     // 🟩 Thông tin hồ sơ bổ sung
-    private String avatarUrl; // ảnh đại diện
-    private String cvUrl;     // đường dẫn CV
+    private String avatarUrl;
+    private String cvUrl;
     @Column(length = 2000)
-    private String bio;       // mô tả cá nhân, giới thiệu ngắn
+    private String bio;
 }

@@ -1,11 +1,13 @@
 package com.academy.ccrpms.auth.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class LoginResponse {
     private String token;
+    private Long userId;
     private String username;
+    private String role;
 }

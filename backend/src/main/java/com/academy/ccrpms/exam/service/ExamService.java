@@ -9,6 +9,7 @@ import com.academy.ccrpms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,19 +17,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ExamService {
 
-    private final TestRepository testRepository;
+    private final ExamRepository examRepository;
     private final QuestionRepository questionRepository;
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
 
-    public Submission submitTest(Long userId, Long testId, Map<Long, String> answers) {
-        System.out.println(">>> submitTest() called for userId=" + userId + ", testId=" + testId);
+    public Submission submitExam(Long userId, Long examId, Map<Long, String> answers) {
+        System.out.println(">>> submitExam() called for userId=" + userId + ", examId=" + examId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
 
         Application app = applicationRepository.findByUser(user).stream()
                 .findFirst()
@@ -40,7 +41,7 @@ public class ExamService {
         int correct = 0;
 
         for (Question q : questions) {
-            if (q.getTest().getId().equals(testId)) {
+            if (q.getExam().getId().equals(examId)) {
                 total++;
                 String userAnswer = answers.get(q.getId());
                 if (userAnswer != null && userAnswer.equalsIgnoreCase(q.getCorrectAnswer())) {
@@ -53,11 +54,29 @@ public class ExamService {
 
         Submission submission = Submission.builder()
                 .user(user)
-                .test(test)
+                .exam(exam)
                 .application(app)
                 .score(score)
                 .build();
 
         return submissionRepository.save(submission);
     }
+
+        // 🟩 Hàm lấy dữ liệu bài thi
+    public Map<String, Object> startExam(Long examId) {
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
+
+        // Lấy danh sách câu hỏi của bài thi
+        List<Question> questions = questionRepository.findByExamId(examId);
+
+        // Đóng gói dữ liệu trả về
+        Map<String, Object> response = new HashMap<>();
+        response.put("examId", exam.getId());
+        response.put("title", exam.getTitle());
+        response.put("questions", questions);
+
+        return response;
+    }
 }
+

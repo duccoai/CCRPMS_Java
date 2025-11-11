@@ -6,15 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SubmissionResponseDTO {
-    private Long submissionId;
-    private Double score;
-    private String testTitle;
-    private String testDescription;
-    private String userName;
-    private String userEmail;
-    private String applicationStatus;
+
+    private Long submissionId;        // ID của bài nộp
+    private double score;             // Điểm
+    private String examDescription;   // Mô tả bài thi
+    private String userName;          // Tên thí sinh
+    private String userEmail;         // Email thí sinh
+    private String applicationStatus; // Trạng thái hồ sơ
 }

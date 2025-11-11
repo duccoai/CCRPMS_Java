@@ -16,7 +16,6 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    // Nộp hồ sơ
     @PostMapping("/submit/{userId}/{jobId}")
     public ResponseEntity<Application> submit(
             @PathVariable Long userId,
@@ -26,7 +25,6 @@ public class ApplicationController {
         return ResponseEntity.ok(app);
     }
 
-    // Xem danh sách hồ sơ của ứng viên
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Application>> getUserApplications(@PathVariable Long userId) {
         return ResponseEntity.ok(applicationService.getApplicationsByUser(userId));

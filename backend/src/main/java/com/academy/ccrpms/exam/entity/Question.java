@@ -1,6 +1,6 @@
 package com.academy.ccrpms.exam.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.academy.ccrpms.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,16 +11,18 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties({"test"}) // ✅ Ngăn vòng lặp
-public class Question {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Question extends BaseEntity {
 
-    private String text;
-    private String correctAnswer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exam_id")
+    private Exam exam;
 
-    @ManyToOne
-    @JoinColumn(name = "test_id")
-    private Test test;
+    private String content;
+
+    private String optionA;
+    private String optionB;
+    private String optionC;
+    private String optionD;
+
+    private String correctAnswer; // ví dụ: "A"
 }

@@ -107,7 +107,7 @@ public class ApplicationService {
                     .findFirst()
                     .orElse(null);
 
-            map.put("testScore", submission != null ? submission.getScore() : null);
+            map.put("examScore", submission != null ? submission.getScore() : null);
             map.put("interviewScore", null); // sẽ thêm module phỏng vấn sau
 
             String finalResult;

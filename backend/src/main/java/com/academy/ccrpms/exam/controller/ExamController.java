@@ -17,19 +17,18 @@ public class ExamController {
     private final ExamService examService;
 
     // ✅ Nộp bài thi và chấm điểm
-    @PostMapping("/submit/{userId}/{testId}")
-    public ResponseEntity<SubmissionResponseDTO> submitTest(
+    @PostMapping("/submit/{userId}/{examId}")
+    public ResponseEntity<SubmissionResponseDTO> submitExam(
             @PathVariable Long userId,
-            @PathVariable Long testId,
+            @PathVariable Long examId,
             @RequestBody(required = false) Map<Long, String> answers // 👈 thêm tham số này
     ) {
-        Submission submission = examService.submitTest(userId, testId, answers);
+        Submission submission = examService.submitExam(userId, examId, answers);
 
         SubmissionResponseDTO dto = SubmissionResponseDTO.builder()
                 .submissionId(submission.getId())
                 .score(submission.getScore())
-                .testTitle(submission.getTest().getTitle())
-                .testDescription(submission.getTest().getDescription())
+                .examDescription(submission.getExam().getDescription())
                 .userName(submission.getUser().getFullName())
                 .userEmail(submission.getUser().getEmail())
                 .applicationStatus(
@@ -41,4 +40,10 @@ public class ExamController {
 
         return ResponseEntity.ok(dto);
     }
+
+        @GetMapping("/start/{examId}")
+        public ResponseEntity<?> startExam(@PathVariable Long examId) {
+        return ResponseEntity.ok(examService.startExam(examId));
+        }
+
 }

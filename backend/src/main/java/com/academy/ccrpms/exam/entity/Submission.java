@@ -22,8 +22,8 @@ public class Submission extends BaseEntity {
     private double score;
 
     @ManyToOne
-    @JoinColumn(name = "test_id")
-    private Test test;
+    @JoinColumn(name = "Exam_id")
+    private Exam exam;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

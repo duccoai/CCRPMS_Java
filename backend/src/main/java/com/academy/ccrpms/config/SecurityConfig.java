@@ -1,5 +1,8 @@
 package com.academy.ccrpms.config;
 
+import com.academy.ccrpms.auth.service.CustomUserDetailsService;
+import com.academy.ccrpms.auth.service.JwtAuthFilter;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,17 +26,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+    private final CustomUserDetailsService userDetailsService;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 🔹 Cho phép CORS, tắt CSRF
+            // ✅ Cho phép CORS và tắt CSRF
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
 
-            // 🔹 Không dùng session (stateless)
+            // ✅ Stateless session (không lưu session)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // 🔹 Cho phép các endpoint public
+            // ✅ Cho phép các endpoint public
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
@@ -41,6 +48,9 @@ public class SecurityConfig {
                     "/api/exams/**",
                     "/api/applications/results/**",
                     "/api/users/**",
+                    "/api/auth/**",
+                    "/api/users/register",
+                    "/uploads/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
@@ -50,13 +60,15 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .anyRequest().authenticated()
-            );
+            )
 
+            // ✅ Thêm filter JWT trước UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Cho phép tất cả origin, headers, methods
+    // ✅ Cho phép tất cả origin, methods, headers
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -70,7 +82,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
