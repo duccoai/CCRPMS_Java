@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "./pages/candidate/Dashboard";
 import JobList from "./pages/candidate/JobList";
 import JobDetail from "./pages/candidate/JobDetail";
-import Profile from "./pages/candidate/Profile";
 import Applications from "./pages/candidate/Applications";
+import Profile from "./pages/candidate/Profile";
+import ExamPage from "./pages/candidate/ExamPage";
+import Results from "./pages/candidate/Results";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
@@ -18,10 +21,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/" element={<PrivateRoute><JobList /></PrivateRoute>} />
+        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/jobs" element={<PrivateRoute><JobList /></PrivateRoute>} />
         <Route path="/jobs/:id" element={<PrivateRoute><JobDetail /></PrivateRoute>} />
-        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/applications" element={<PrivateRoute><Applications /></PrivateRoute>} />
+        <Route path="/exam" element={<PrivateRoute><ExamPage /></PrivateRoute>} />
+        <Route path="/results" element={<PrivateRoute><Results /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   );
