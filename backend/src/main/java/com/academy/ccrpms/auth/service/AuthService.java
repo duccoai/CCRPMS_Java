@@ -3,6 +3,7 @@ package com.academy.ccrpms.auth.service;
 import com.academy.ccrpms.auth.model.CustomUserDetails;
 import com.academy.ccrpms.auth.model.LoginRequest;
 import com.academy.ccrpms.auth.model.LoginResponse;
+import com.academy.ccrpms.auth.model.UserResponse;   // ✅ Thêm dòng này
 import com.academy.ccrpms.user.entity.Role;
 import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.RoleRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,19 @@ public class AuthService {
 
         String token = jwtService.generateToken(userDetails);
 
-        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRole().getName());
+        UserResponse.RoleResponse roleResponse = new UserResponse.RoleResponse(
+                user.getRole().getId(),
+                user.getRole().getName()
+        );
+
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getFullName(),
+                roleResponse
+        );
+
+        return new LoginResponse(token, userResponse);
     }
+
 }

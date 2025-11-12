@@ -1,6 +1,7 @@
 package com.academy.ccrpms.job.controller;
 
-import com.academy.ccrpms.job.entity.Job;
+import com.academy.ccrpms.job.dto.JobRequestDTO;
+import com.academy.ccrpms.job.dto.JobResponseDTO;
 import com.academy.ccrpms.job.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +17,24 @@ public class JobController {
     private final JobService jobService;
 
     @PostMapping
-    public ResponseEntity<Job> createJob(@RequestBody Job job) {
-        return ResponseEntity.ok(jobService.createJob(job));
+    public ResponseEntity<JobResponseDTO> createJob(@RequestBody JobRequestDTO request) {
+        JobResponseDTO created = jobService.createJob(request);
+        return ResponseEntity.ok(created);
     }
 
     @GetMapping
-    public ResponseEntity<List<Job>> getAllJobs() {
+    public ResponseEntity<List<JobResponseDTO>> getAllJobs() {
         return ResponseEntity.ok(jobService.getAllJobs());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Job> getJobById(@PathVariable Long id) {
+    public ResponseEntity<JobResponseDTO> getJobById(@PathVariable Long id) {
         return ResponseEntity.ok(jobService.getJobById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Job> updateJob(@PathVariable Long id, @RequestBody Job job) {
-        return ResponseEntity.ok(jobService.updateJob(id, job));
+    public ResponseEntity<JobResponseDTO> updateJob(@PathVariable Long id, @RequestBody JobRequestDTO request) {
+        return ResponseEntity.ok(jobService.updateJob(id, request));
     }
 
     @DeleteMapping("/{id}")

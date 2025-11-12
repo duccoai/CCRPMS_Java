@@ -27,7 +27,7 @@ public class Application extends BaseEntity {
     // Vị trí ứng tuyển
     @ManyToOne
     @JoinColumn(name = "job_id")
-    private Job job;
+    private Job job; // phải import com.academy.ccrpms.job.entity.Job
 
     // Trạng thái hồ sơ
     @Builder.Default

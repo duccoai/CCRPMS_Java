@@ -2,7 +2,6 @@ package com.academy.ccrpms.config;
 
 import com.academy.ccrpms.auth.service.CustomUserDetailsService;
 import com.academy.ccrpms.auth.service.JwtAuthFilter;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,15 +31,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Cho phép CORS và tắt CSRF
+            // CORS + CSRF
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Stateless session (không lưu session)
+            // Stateless session
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // ✅ Cho phép các endpoint public
+            // Authorize requests: chú ý thứ tự -> public, role-based, then anyRequest
             .authorizeHttpRequests(auth -> auth
+                // Các API public (permitAll)
                 .requestMatchers(
                     "/api/auth/**",
                     "/api/jobs/**",
@@ -55,20 +55,25 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
                     "/webjars/**",
+                    "/api/recruiter/**",
                     "/error",
                     "/",
                     "/favicon.ico"
                 ).permitAll()
+
+                // Các endpoint cần role cụ thể (đặt trước anyRequest)
+                .requestMatchers("/api/recruiter/**").hasRole("RECRUITER")
+
+                // Mọi request khác cần xác thực
                 .anyRequest().authenticated()
             )
 
-            // ✅ Thêm filter JWT trước UsernamePasswordAuthenticationFilter
+            // Thêm filter JWT trước UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Cho phép tất cả origin, methods, headers
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

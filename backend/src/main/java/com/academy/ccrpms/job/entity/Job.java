@@ -1,6 +1,7 @@
 package com.academy.ccrpms.job.entity;
 
 import com.academy.ccrpms.common.BaseEntity;
+import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.application.entity.Application;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -25,8 +26,9 @@ public class Job extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "EXAM")
+    @Column(columnDefinition = "TEXT")
     private String description;
+
 
     private String location;
 
@@ -39,4 +41,9 @@ public class Job extends BaseEntity {
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("job") // ✅ Ngăn serialize ngược từ application về job
     private List<Application> applications;
+
+    @ManyToOne
+    @JoinColumn(name = "recruiter_id") // tên cột FK
+    private User recruiter; // hoặc Recruiter nếu bạn có entity riêng
+
 }

@@ -1,9 +1,10 @@
 package com.academy.ccrpms.user.entity;
 
-import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.common.BaseEntity;
+import com.academy.ccrpms.job.entity.Job;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,20 +19,26 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String username;
+
     private String password;
-    private String email;
+
     private String fullName;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    private String email;
 
     private boolean active = true;
 
-    // 🟩 Thông tin hồ sơ bổ sung
-    private String avatarUrl;
-    private String cvUrl;
-    @Column(length = 2000)
-    private String bio;
+    // 🟩 Thêm 3 trường bị thiếu
+    private String avatarUrl;  // link ảnh đại diện
+    private String bio;        // mô tả ngắn
+    private String cvUrl;      // link CV của user
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @OneToMany(mappedBy = "recruiter", cascade = CascadeType.ALL)
+    private List<Job> jobs;
 }
