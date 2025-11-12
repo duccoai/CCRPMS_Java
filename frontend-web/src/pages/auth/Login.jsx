@@ -1,3 +1,4 @@
+// src/pages/auth/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/api";
@@ -7,20 +8,26 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    try {
-      const res = await api.post("/auth/login", form);
-      const { token, userId, username } = res.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("username", username);
+async function handleSubmit(e) {
+  e.preventDefault();
+  try {
+    const res = await api.post("/auth/login", form);
+    const { token, user } = res.data; // nhấn mạnh: user là object
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user)); // ✅ lưu cả object
+    // tự động redirect dựa trên role
+    if (user.role?.name === "RECRUITER") {
+      navigate("/recruiter/dashboard");
+    } else {
       navigate("/");
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Đăng nhập thất bại");
     }
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Đăng nhập thất bại");
   }
+}
+
+
 
   return (
     <div style={styles.container}>
@@ -40,7 +47,9 @@ export default function Login() {
         {error && <div style={{ color: "red" }}>{error}</div>}
         <button type="submit">Đăng nhập</button>
       </form>
-      <p>Chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
+      <p>
+        Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+      </p>
     </div>
   );
 }
