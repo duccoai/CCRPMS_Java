@@ -31,7 +31,7 @@ public class ExamService {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
-        Application app = applicationRepository.findByUser(user).stream()
+        Application app = applicationRepository.findByUser_ID(user).stream()
                 .findFirst()
                 .orElse(null);
 

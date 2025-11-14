@@ -17,20 +17,20 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "4D635166546A576E5A7234753778214125442A472D4B6150645367566B597033"; // sinh ngẫu nhiên 64 ký tự
+    // 64-char base64 string (you already used). Keep this secret in properties in production.
+    private static final String SECRET_KEY = "4D635166546A576E5A7234753778214125442A472D4B6150645367566B597033";
 
-    // ✅ sinh token JWT
+    // generate token (24h expiration)
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts
-                .builder()
+        return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24)) // 24h
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -44,10 +44,11 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    // parse claims with small allowed clock skew (60 seconds)
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
+                .setAllowedClockSkewSeconds(60) // allow 60s skew
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -59,12 +60,21 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (Exception e) {
+            // if parse fails, treat as expired/invalid
+            return true;
+        }
     }
 
     private Date extractExpiration(String token) {

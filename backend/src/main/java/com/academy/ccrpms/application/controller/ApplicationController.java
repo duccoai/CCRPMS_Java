@@ -1,13 +1,16 @@
 package com.academy.ccrpms.application.controller;
 
+import com.academy.ccrpms.application.dto.ApplicationResponseDTO;
 import com.academy.ccrpms.application.entity.Application;
 import com.academy.ccrpms.application.service.ApplicationService;
+import com.academy.ccrpms.auth.model.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -16,29 +19,29 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    @PostMapping("/submit/{userId}/{jobId}")
-    public ResponseEntity<Application> submit(
-            @PathVariable Long userId,
+    // Nộp hồ sơ → chỉ cần jobId, candidate lấy từ token
+    @PostMapping("/submit/{jobId}")
+    public ResponseEntity<ApplicationResponseDTO> submit(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long jobId
     ) {
-        Application app = applicationService.submitApplication(userId, jobId);
-        return ResponseEntity.ok(app);
+        Application app = applicationService.submitApplication(userDetails.getId(), jobId);
+        ApplicationResponseDTO dto = ApplicationResponseDTO.fromEntity(app);
+        return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Application>> getUserApplications(@PathVariable Long userId) {
-        return ResponseEntity.ok(applicationService.getApplicationsByUser(userId));
-    }
 
-    @GetMapping("/status/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getStatusByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(applicationService.getApplicationStatuses(userId));
+    // Lấy hồ sơ user hiện tại
+    @GetMapping("/user/me")
+    public ResponseEntity<List<ApplicationResponseDTO>> getMyApplications(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().getId();
+        List<Application> apps = applicationService.getApplicationsByUser(userId);
+        List<ApplicationResponseDTO> dtos = apps.stream()
+                .map(ApplicationResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
-
-    @GetMapping("/result/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getApplicationResults(@PathVariable Long userId) {
-        return ResponseEntity.ok(applicationService.getApplicationResults(userId));
-    }
-
 
 }

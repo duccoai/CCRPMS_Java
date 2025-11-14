@@ -59,7 +59,6 @@ public class JobService {
         Job job = new Job();
         applyRequestToJob(request, job);
         Job saved = jobRepository.save(job);
-        // map to DTO
         return JobResponseDTO.fromEntity(saved);
     }
 
@@ -105,24 +104,19 @@ public class JobService {
     private void applyRequestToJob(JobRequestDTO request, Job job) {
         if (request == null) return;
 
-        if (request.title() != null) job.setTitle(request.title());
-        if (request.description() != null) job.setDescription(request.description());
-        if (request.location() != null) job.setLocation(request.location());
-        if (request.salaryRange() != null) job.setSalaryRange(request.salaryRange());
+        if (request.getTitle() != null) job.setTitle(request.getTitle());
+        if (request.getDescription() != null) job.setDescription(request.getDescription());
+        if (request.getLocation() != null) job.setLocation(request.getLocation());
+        if (request.getSalaryRange() != null) job.setSalaryRange(request.getSalaryRange());
 
-        if (request.status() != null) {
-            try {
-                JobStatus js = JobStatus.valueOf(request.status());
-                job.setStatus(js);
-            } catch (IllegalArgumentException e) {
-                // invalid enum name -> ignore or you can throw custom exception
-                // here: ignore so it won't overwrite existing status
-            }
+        if (request.getStatus() != null) {
+            // request.status is already JobStatus enum (as per DTO)
+            job.setStatus(request.getStatus());
         }
 
-        if (request.recruiterId() != null) {
-            User recruiter = userRepository.findById(request.recruiterId())
-                    .orElseThrow(() -> new RuntimeException("Recruiter (User) not found with id: " + request.recruiterId()));
+        if (request.getRecruiterId() != null) {
+            User recruiter = userRepository.findById(request.getRecruiterId())
+                    .orElseThrow(() -> new RuntimeException("Recruiter (User) not found with id: " + request.getRecruiterId()));
             job.setRecruiter(recruiter);
         }
     }

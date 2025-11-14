@@ -16,11 +16,11 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    // Trả role dạng ROLE_CANDIDATE hoặc ROLE_RECRUITER
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
     }
-
 
     @Override
     public String getPassword() {
@@ -54,5 +54,14 @@ public class CustomUserDetails implements UserDetails {
 
     public User getUser() {
         return user;
+    }
+
+    // Hàm tiện ích để lấy role name chuẩn
+    public String getRoleName() {
+        return user.getRole().getName(); // "CANDIDATE" hoặc "RECRUITER"
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 }

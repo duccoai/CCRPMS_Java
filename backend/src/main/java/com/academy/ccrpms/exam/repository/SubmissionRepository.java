@@ -1,17 +1,11 @@
 package com.academy.ccrpms.exam.repository;
 
 import com.academy.ccrpms.exam.entity.Submission;
-import com.academy.ccrpms.application.entity.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import java.util.Optional;
 
-@Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
-    // 🟢 Lấy danh sách bài thi theo hồ sơ ứng tuyển
-    List<Submission> findByApplication(Application application);
-
-    // 🟢 Dùng cho ApplicationService (đã có sẵn)
-    List<Submission> findByUserId(Long userId);
+    List<Submission> findByUser_Id(Long userId);
+    Optional<Submission> findFirstByApplication_IdOrderByCreatedAtDesc(Long applicationId);
 }

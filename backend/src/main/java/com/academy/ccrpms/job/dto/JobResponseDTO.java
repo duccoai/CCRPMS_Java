@@ -1,27 +1,43 @@
 package com.academy.ccrpms.job.dto;
 
-import com.academy.ccrpms.user.dto.UserSummaryDTO;
-import com.academy.ccrpms.job.entity.Job;
+import lombok.*;
 
-public record JobResponseDTO(
-    Long id,
-    String title,
-    String description,
-    String location,
-    String salaryRange,
-    String status,
-    UserSummaryDTO recruiter
-) {
-    public static JobResponseDTO fromEntity(Job job) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class JobResponseDTO {
+    private Long id;
+    private String title;
+    private String description;
+    private String location;
+    private String salaryRange;
+    private String status;
+    private RecruiterLite recruiter;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecruiterLite {
+        private Long id;
+        private String username;
+        private String email;
+    }
+
+    public static JobResponseDTO fromEntity(com.academy.ccrpms.job.entity.Job job) {
         if (job == null) return null;
-        return new JobResponseDTO(
-            job.getId(),
-            job.getTitle(),
-            job.getDescription(),
-            job.getLocation(),
-            job.getSalaryRange(),
-            job.getStatus() != null ? job.getStatus().name() : null,
-            UserSummaryDTO.fromEntity(job.getRecruiter())
-        );
+        return JobResponseDTO.builder()
+                .id(job.getId())
+                .title(job.getTitle())
+                .description(job.getDescription())
+                .location(job.getLocation())
+                .salaryRange(job.getSalaryRange())
+                .status(job.getStatus() != null ? job.getStatus().name() : null)
+                .recruiter(job.getRecruiter() == null ? null : new RecruiterLite(
+                        job.getRecruiter().getId(),
+                        job.getRecruiter().getUsername(),
+                        job.getRecruiter().getEmail()
+                ))
+                .build();
     }
 }

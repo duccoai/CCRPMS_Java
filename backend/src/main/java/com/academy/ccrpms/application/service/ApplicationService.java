@@ -3,12 +3,13 @@ package com.academy.ccrpms.application.service;
 import com.academy.ccrpms.application.entity.Application;
 import com.academy.ccrpms.application.entity.ApplicationStatus;
 import com.academy.ccrpms.application.repository.ApplicationRepository;
-import com.academy.ccrpms.job.entity.Job;
 import com.academy.ccrpms.job.repository.JobRepository;
-import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.UserRepository;
+import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.exam.entity.Submission;
 import com.academy.ccrpms.exam.repository.SubmissionRepository;
+import com.academy.ccrpms.recruiter.entity.Interview;
+import com.academy.ccrpms.recruiter.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,35 +23,31 @@ public class ApplicationService {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final SubmissionRepository submissionRepository;
+    private final InterviewRepository interviewRepository;
 
-    // 🟩 Nộp hồ sơ ứng tuyển
+    // Nộp hồ sơ ứng tuyển
     public Application submitApplication(Long userId, Long jobId) {
-        System.out.println(">>> SubmitApplication called for userId=" + userId + ", jobId=" + jobId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        var job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
-
-        Application app = Application.builder()
-                .user(user)
-                .job(job)
-                .status(ApplicationStatus.PENDING)
-                .build();
+        Application app = new Application();
+        app.setUser(user);
+        app.setJob(job);
+        app.setStatus(ApplicationStatus.PENDING);
 
         return applicationRepository.save(app);
     }
 
-    // 🟩 Lấy danh sách hồ sơ của người dùng
+    // Lấy danh sách hồ sơ của người dùng
     public List<Application> getApplicationsByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return applicationRepository.findByUser(user);
+        return applicationRepository.findByUser_Id(userId);
     }
 
-    // 🟩 Theo dõi trạng thái hồ sơ
+    // Theo dõi trạng thái hồ sơ
     public List<Map<String, Object>> getApplicationStatuses(Long userId) {
-        List<Application> apps = applicationRepository.findByUserId(userId);
+        List<Application> apps = getApplicationsByUser(userId);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Application app : apps) {
@@ -65,33 +62,24 @@ public class ApplicationService {
                 statusText = "Không rõ trạng thái";
             } else {
                 switch (app.getStatus()) {
-                    case PENDING:
-                        statusText = "Đang chờ duyệt";
-                        break;
-                    case INTERVIEW:
-                        statusText = "Được phỏng vấn";
-                        break;
-                    case REJECTED:
-                        statusText = "Trượt";
-                        break;
-                    case HIRED:
-                        statusText = "Đỗ";
-                        break;
-                    default:
-                        statusText = "Không rõ trạng thái";
+                    case PENDING -> statusText = "Đang chờ duyệt";
+                    case INTERVIEW -> statusText = "Được phỏng vấn";
+                    case REJECTED -> statusText = "Trượt";
+                    case HIRED -> statusText = "Đỗ";
+                    case APPROVED -> statusText = "Được duyệt";
+                    default -> statusText = "Không rõ trạng thái";
                 }
             }
-
             map.put("status", statusText);
             result.add(map);
         }
         return result;
     }
 
-    // 🟩 Xem kết quả tuyển dụng (điểm thi + trạng thái)
+    // Xem kết quả tuyển dụng (điểm thi + trạng thái)
     public List<Map<String, Object>> getApplicationResults(Long userId) {
-        List<Application> apps = applicationRepository.findByUserId(userId);
-        List<Submission> submissions = submissionRepository.findByUserId(userId);
+        List<Application> apps = getApplicationsByUser(userId);
+        List<Submission> submissions = submissionRepository.findByUser_Id(userId);
         List<Map<String, Object>> results = new ArrayList<>();
 
         for (Application app : apps) {
@@ -101,31 +89,27 @@ public class ApplicationService {
             map.put("submittedAt", app.getCreatedAt());
             map.put("status", app.getStatus() != null ? app.getStatus().name() : "UNKNOWN");
 
-            // tìm submission tương ứng
+            // Submission mới nhất
             Submission submission = submissions.stream()
                     .filter(s -> s.getApplication() != null && s.getApplication().getId().equals(app.getId()))
-                    .findFirst()
-                    .orElse(null);
-
+                    .findFirst().orElse(null);
             map.put("examScore", submission != null ? submission.getScore() : null);
-            map.put("interviewScore", null); // sẽ thêm module phỏng vấn sau
+
+            // Interview mới nhất
+            Optional<Interview> interview = interviewRepository.findAll().stream()
+                    .filter(iv -> iv.getApplication() != null && iv.getApplication().getId().equals(app.getId()))
+                    .findFirst();
+            map.put("interviewScore", interview.map(Interview::getScore).orElse(null));
 
             String finalResult;
-            if (app.getStatus() == null) {
-                finalResult = "Không rõ trạng thái";
-            } else {
+            if (app.getStatus() == null) finalResult = "Không rõ trạng thái";
+            else {
                 switch (app.getStatus()) {
-                    case HIRED:
-                        finalResult = "Đỗ";
-                        break;
-                    case REJECTED:
-                        finalResult = "Trượt";
-                        break;
-                    case INTERVIEW:
-                        finalResult = "Đang phỏng vấn";
-                        break;
-                    default:
-                        finalResult = "Đang chờ duyệt";
+                    case HIRED -> finalResult = "Đỗ";
+                    case REJECTED -> finalResult = "Trượt";
+                    case INTERVIEW -> finalResult = "Đang phỏng vấn";
+                    case APPROVED -> finalResult = "Được duyệt";
+                    default -> finalResult = "Đang chờ duyệt";
                 }
             }
             map.put("finalResult", finalResult);
