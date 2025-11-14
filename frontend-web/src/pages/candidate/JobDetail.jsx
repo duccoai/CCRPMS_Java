@@ -3,11 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 
 export default function JobDetail() {
-  const { id } = useParams();
+  const { id } = useParams(); // jobId
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
-  const userId = Number(localStorage.getItem("userId") || 1); // default 1
 
   useEffect(() => {
     api.get(`/jobs/${id}`)
@@ -17,8 +16,7 @@ export default function JobDetail() {
   }, [id]);
 
   function handleApply() {
-    // controller hiện tại dùng POST /api/applications/submit/{userId}/{jobId}
-    api.post(`/applications/submit/${userId}/${id}`)
+    api.post(`/applications/submit/${id}`)
       .then(res => {
         alert("Nộp hồ sơ thành công!");
         navigate("/applications");
@@ -28,6 +26,7 @@ export default function JobDetail() {
         alert("Nộp hồ sơ thất bại: " + (err?.response?.data?.message || err.message));
       });
   }
+
 
   if (loading) return <div style={{padding:20}}>Loading…</div>;
   if (!job) return <div style={{padding:20}}>Job not found</div>;

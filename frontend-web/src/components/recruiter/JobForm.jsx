@@ -1,17 +1,14 @@
 // src/components/recruiter/JobForm.jsx
 import React, { useState, useEffect } from 'react';
 import RecruiterApi from '../../services/recruiterApi';
-import { useAuth } from '../../context/AuthContext';
 
 const JobForm = ({ initial = null, onClose }) => {
-  const { user } = useAuth();
   const [form, setForm] = useState({
     title: '',
     description: '',
     location: '',
     salaryRange: '',
-    status: 'OPEN',
-    recruiterId: user?.id || null
+    status: 'OPEN'
   });
   const isEdit = !!initial;
 
@@ -22,11 +19,10 @@ const JobForm = ({ initial = null, onClose }) => {
         description: initial.description || '',
         location: initial.location || '',
         salaryRange: initial.salaryRange || '',
-        status: initial.status || 'OPEN',
-        recruiterId: initial.recruiter?.id || user?.id || null
+        status: initial.status || 'OPEN'
       });
     }
-  }, [initial, user]);
+  }, [initial]);
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -36,17 +32,29 @@ const JobForm = ({ initial = null, onClose }) => {
   async function submit(e) {
     e.preventDefault();
     try {
+      // include recruiterId from localStorage user object if not set
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const payload = {
+        title: form.title,
+        description: form.description,
+        location: form.location,
+        salaryRange: form.salaryRange,
+        status: form.status,
+        recruiterId: form.recruiterId || user?.id
+      };
+
       if (isEdit) {
-        await RecruiterApi.updateJob(initial.id, form);
+        await RecruiterApi.updateJob(initial.id, payload);
       } else {
-        await RecruiterApi.createJob(form);
+        await RecruiterApi.createJob(payload);
       }
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Lỗi khi lưu job');
+      alert('Lỗi khi lưu job: ' + (err?.response?.data?.message || err.message));
     }
   }
+
 
   return (
     <div style={{ border: '1px solid #ddd', padding: 12, marginBottom: 12 }}>
