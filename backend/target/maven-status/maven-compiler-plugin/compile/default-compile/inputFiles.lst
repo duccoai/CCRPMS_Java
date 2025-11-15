@@ -12,6 +12,7 @@ D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\user\
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\auth\service\CustomLoginSuccessHandler.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\exam\entity\Answer.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\exam\entity\Exam.java
+D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\recruiter\dto\SubmissionDTO.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\exam\repository\ExamRepository.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\job\controller\JobController.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\admin\dto\AdminStatsDTO.java

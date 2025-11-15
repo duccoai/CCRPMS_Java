@@ -1,17 +1,22 @@
 package com.academy.ccrpms.recruiter.dto;
 
-import lombok.*;
+import com.academy.ccrpms.recruiter.entity.Interview;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class InterviewScheduleDTO {
     private Long applicationId;
-    /**
-     * interviewDate received as String (ISO-like). Example: "2025-11-14T14:30" or "2025-11-14T14:30:00"
-     */
-    private String interviewDate;
+    private LocalDateTime interviewDate;
     private String location;
-    private String note;
+    private String note; // optional
+
+    public Interview toEntity() {
+        Interview interview = new Interview();
+        interview.setInterviewDate(this.interviewDate);
+        interview.setLocation(this.location);
+        interview.setNote(this.note);
+        return interview;
+    }
 }

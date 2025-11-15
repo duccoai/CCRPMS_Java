@@ -40,7 +40,7 @@ public class ApplicationController {
             return ResponseEntity.status(401).build();
         }
         Long userId = userDetails.getUser().getId();
-        List<Application> apps = applicationService.getApplicationsByUser(userId);
+        List<Application> apps = applicationService.getApplicationsByCandidate(userId);
         List<ApplicationResponseDTO> dtos = apps.stream()
                 .map(ApplicationResponseDTO::fromEntity)
                 .collect(Collectors.toList());

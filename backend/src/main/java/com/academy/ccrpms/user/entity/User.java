@@ -35,9 +35,9 @@ public class User extends BaseEntity {
     private boolean active = true;
 
     // Thêm các trường phụ trợ
-    private String avatarUrl;  // link ảnh đại diện
-    private String bio;        // mô tả ngắn
-    private String cvUrl;      // link CV của user
+    private String avatarUrl; // link ảnh đại diện
+    private String bio;       // mô tả ngắn
+    private String cvUrl;     // link CV của user
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")

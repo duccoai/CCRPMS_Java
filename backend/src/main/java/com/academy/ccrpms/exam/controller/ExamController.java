@@ -21,7 +21,7 @@ public class ExamController {
     public ResponseEntity<SubmissionResponseDTO> submitExam(
             @PathVariable Long userId,
             @PathVariable Long examId,
-            @RequestBody(required = false) Map<Long, String> answers // 👈 thêm tham số này
+            @RequestBody(required = false) Map<Long, String> answers // 👈 câu trả lời từ client
     ) {
         Submission submission = examService.submitExam(userId, examId, answers);
 
@@ -41,9 +41,9 @@ public class ExamController {
         return ResponseEntity.ok(dto);
     }
 
-        @GetMapping("/start/{examId}")
-        public ResponseEntity<?> startExam(@PathVariable Long examId) {
+    // ✅ Bắt đầu làm bài thi
+    @GetMapping("/start/{examId}")
+    public ResponseEntity<?> startExam(@PathVariable Long examId) {
         return ResponseEntity.ok(examService.startExam(examId));
-        }
-
+    }
 }

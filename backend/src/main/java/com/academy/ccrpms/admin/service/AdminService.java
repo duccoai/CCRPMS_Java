@@ -31,7 +31,7 @@ public class AdminService {
     private final ExamRepository examRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Tạo user và gán role
+    // Tạo user với role
     public User createUserWithRole(User user, String roleName) {
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found"));
@@ -48,7 +48,6 @@ public class AdminService {
         return createUserWithRole(user, "ADMIN");
     }
 
-    // update cơ bản
     public User updateUser(Long id, User data) {
         User u = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         if (data.getFullName() != null) u.setFullName(data.getFullName());
@@ -85,21 +84,25 @@ public class AdminService {
     public Exam toggleExam(Long id) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
-        // nếu field active tồn tại trong Exam
         exam.setActive(!exam.isActive());
         return examRepository.save(exam);
     }
 
     public AdminStatsDTO getStatistics() {
-        // Tổng số users có role CANDIDATE (nếu bạn muốn chính xác theo role)
+        // Tổng số users có role CANDIDATE
         long totalCandidates = userRepository.findAll()
                 .stream()
-                .filter(u -> u.getRole() != null && "CANDIDATE".equalsIgnoreCase(u.getRole().getName()))
+                .filter(u -> u.getRole() != null)          // tránh null role
+                .filter(u -> "CANDIDATE".equalsIgnoreCase(u.getRole().getName()))
                 .count();
 
         long totalApplications = applicationRepository.count();
+
+        // Đảm bảo countByStatus tồn tại trong ApplicationRepository
         long passed = applicationRepository.countByStatus(ApplicationStatus.APPROVED);
         long failed = applicationRepository.countByStatus(ApplicationStatus.REJECTED);
+
         return new AdminStatsDTO(totalCandidates, totalApplications, passed, failed);
     }
+
 }

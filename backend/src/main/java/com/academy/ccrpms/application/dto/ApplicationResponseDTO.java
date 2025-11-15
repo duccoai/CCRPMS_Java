@@ -21,15 +21,16 @@ public class ApplicationResponseDTO {
     private String status;
     private OffsetDateTime createdAt;
 
-    public static ApplicationResponseDTO fromEntity(Application app) {
-        return ApplicationResponseDTO.builder()  // <--- đây sẽ tồn tại nếu có @Builder
-                .id(app.getId())
-                .candidateName(app.getUser() != null ? app.getUser().getFullName() : null)
-                .candidateEmail(app.getUser() != null ? app.getUser().getEmail() : null)
-                .jobId(app.getJob() != null ? app.getJob().getId() : null)
-                .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
-                .status(app.getStatus() != null ? app.getStatus().name() : "PENDING")
-                .createdAt(app.getCreatedAt())
-                .build();
-    }
+public static ApplicationResponseDTO fromEntity(Application app) {
+    return ApplicationResponseDTO.builder()
+            .id(app.getId())
+            .candidateName(app.getCandidate() != null ? app.getCandidate().getFullName() : null)
+            .candidateEmail(app.getCandidate() != null ? app.getCandidate().getEmail() : null)
+            .jobId(app.getJob() != null ? app.getJob().getId() : null)
+            .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
+            .status(app.getStatus() != null ? app.getStatus().name() : "PENDING")
+            .createdAt(app.getCreatedAt())
+            .build();
+}
+
 }
