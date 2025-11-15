@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/api";
 
 export default function Login() {
-  const [role, setRole] = useState("CANDIDATE"); // default
+  const [role, setRole] = useState("CANDIDATE");
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,6 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // --- Xóa token/user cũ ---
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
@@ -34,14 +33,14 @@ export default function Login() {
         return;
       }
 
-      // Chuẩn hóa user
       let user = data.user || null;
+
       if (!user && (data.userId || data.username || data.role)) {
         user = {
           id: data.userId,
           username: data.username,
           fullName: data.fullName || data.username || "",
-          role: { name: data.role || role }
+          role: { name: data.role }
         };
       }
 
@@ -49,24 +48,26 @@ export default function Login() {
         user = { username: data.username || form.username, role: { name: role } };
       }
 
-      // Kiểm tra role chọn có trùng với role user backend trả
-      const backendRole = (user.role?.name || "CANDIDATE").toUpperCase();
-      if (backendRole !== role) {
-        setError(`Vui lòng đăng nhập bằng tài khoản ${role.toLowerCase()}`);
+      // 🔥 Chỉ giữ một biến backendRole duy nhất
+      const backendRole = (user.role?.name || "").toUpperCase();
+      const selectedRole = role.toUpperCase();
+
+      if (backendRole !== selectedRole) {
+        setError(`Vui lòng đăng nhập bằng tài khoản có role: ${selectedRole}`);
         setLoading(false);
         return;
       }
 
-      // Lưu token + user
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("username", user.username || user.fullName || "");
       localStorage.setItem("userId", user.id ? String(user.id) : "");
-      localStorage.setItem("role", (user.role && (user.role.name || user.role)) || "");
+      localStorage.setItem("role", backendRole);
 
-
-            // Chuyển hướng
-      if (role === "RECRUITER") navigate("/recruiter/dashboard");
+      // 🔥 Redirect theo role chuẩn
+      if (backendRole === "ADMIN") navigate("/admin");
+      else if (backendRole === "RECRUITER") navigate("/recruiter/dashboard");
+      else if (backendRole === "CANDIDATE") navigate("/candidate/jobs");
       else navigate("/");
 
     } catch (err) {
@@ -82,11 +83,12 @@ export default function Login() {
     }
   }
 
+
   return (
     <div style={styles.container}>
       <h2>Đăng nhập</h2>
 
-      {/* Selector Role */}
+      {/* Role selector */}
       <div style={{ marginBottom: 15 }}>
         <label>
           <input
@@ -97,6 +99,7 @@ export default function Login() {
           />
           Candidate
         </label>
+
         <label style={{ marginLeft: 10 }}>
           <input
             type="radio"
@@ -105,6 +108,16 @@ export default function Login() {
             onChange={() => setRole("RECRUITER")}
           />
           Recruiter
+        </label>
+
+        <label style={{ marginLeft: 10 }}>
+          <input
+            type="radio"
+            value="ADMIN"
+            checked={role === "ADMIN"}
+            onChange={() => setRole("ADMIN")}
+          />
+          Admin
         </label>
       </div>
 
@@ -120,7 +133,9 @@ export default function Login() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
+
         {error && <div style={{ color: "red" }}>{error}</div>}
+
         <button type="submit" disabled={loading}>
           {loading ? "Đang đăng nhập..." : "Đăng nhập"}
         </button>

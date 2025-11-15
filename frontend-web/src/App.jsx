@@ -14,14 +14,20 @@ import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import RecruiterJobs from "./pages/recruiter/RecruiterJobs";
 import RecruiterApplications from "./pages/recruiter/RecruiterApplications";
 
+// Admin
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminApplications from "./pages/admin/AdminApplications";
+import AdminInterviews from "./pages/admin/AdminInterviews";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminReports from "./pages/admin/AdminReports";
+
 // Auth
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
-// Components
 import RequireRole from "./components/RequireRole.jsx";
 
-// Private route cho candidate
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" replace />;
@@ -48,6 +54,16 @@ export default function App() {
         <Route path="/recruiter/dashboard" element={<RequireRole role="RECRUITER"><RecruiterDashboard /></RequireRole>} />
         <Route path="/recruiter/jobs" element={<RequireRole role="RECRUITER"><RecruiterJobs /></RequireRole>} />
         <Route path="/recruiter/applications" element={<RequireRole role="RECRUITER"><RecruiterApplications /></RequireRole>} />
+
+        {/* Admin (nested route) */}
+        <Route path="/admin" element={<RequireRole role="ADMIN"><AdminDashboard /></RequireRole>}>
+          <Route index element={<p>Chọn tab để bắt đầu quản trị.</p>} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="applications" element={<AdminApplications />} />
+          <Route path="interviews" element={<AdminInterviews />} />
+          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="reports" element={<AdminReports />} />
+        </Route>
 
         {/* fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
