@@ -1,30 +1,30 @@
-import { Link, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { getAdminStats } from "../../services/adminApi";
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getAdminStats()
+      .then(res => setStats(res.data))
+      .catch(err => {
+        console.error("Failed to load admin stats:", err);
+        setError("Không thể tải thống kê. Vui lòng thử lại sau.");
+      });
+  }, []);
+
+  if (error) return <p>{error}</p>;
+  if (!stats) return <p>Loading...</p>;
+
   return (
-    <div className="admin-dashboard">
-      <h1>Chào mừng bạn đến khu vực quản trị</h1>
-
-      <div className="tabs" style={{ marginBottom: 20 }}>
-        <Link to="users">
-          <button>Quản lý người dùng</button>
-        </Link>
-        <Link to="applications">
-          <button>Hồ sơ ứng tuyển</button>
-        </Link>
-        <Link to="interviews">
-          <button>Phỏng vấn & Bài thi</button>
-        </Link>
-        <Link to="jobs">
-          <button>Quản lý bài đăng</button>
-        </Link>
-        <Link to="reports">
-          <button>Báo cáo</button>
-        </Link>
-      </div>
-
-      <div className="tab-content">
-        <Outlet />
+    <div>
+      <h1>Admin Dashboard</h1>
+      <div className="cards">
+        <div className="card">Tổng ứng viên: {stats.totalCandidates}</div>
+        <div className="card">Tổng hồ sơ: {stats.totalApplications}</div>
+        <div className="card">Được duyệt: {stats.passed}</div>
+        <div className="card">Trượt: {stats.failed}</div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 // Candidate
 import Dashboard from "./pages/candidate/Dashboard";
@@ -19,8 +19,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApplications from "./pages/admin/AdminApplications";
 import AdminInterviews from "./pages/admin/AdminInterviews";
-import AdminJobs from "./pages/admin/AdminJobs";
+import AdminExams from "./pages/admin/AdminExams";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminLayout from "./components/layout/AdminLayout";
 
 // Auth
 import Login from "./pages/auth/Login";
@@ -55,13 +56,15 @@ export default function App() {
         <Route path="/recruiter/jobs" element={<RequireRole role="RECRUITER"><RecruiterJobs /></RequireRole>} />
         <Route path="/recruiter/applications" element={<RequireRole role="RECRUITER"><RecruiterApplications /></RequireRole>} />
 
-        {/* Admin (nested route) */}
-        <Route path="/admin" element={<RequireRole role="ADMIN"><AdminDashboard /></RequireRole>}>
-          <Route index element={<p>Chọn tab để bắt đầu quản trị.</p>} />
+        {/* Admin */}
+        <Route path="/admin/*" element={<RequireRole role="ADMIN"><AdminLayout><Outlet /></AdminLayout></RequireRole>}>
+          {/* Index route: trang chào mừng */}
+          <Route index element={<p>Chào mừng Admin! Chọn tab bên trái để bắt đầu.</p>} />
+          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="applications" element={<AdminApplications />} />
           <Route path="interviews" element={<AdminInterviews />} />
-          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="exams" element={<AdminExams />} />
           <Route path="reports" element={<AdminReports />} />
         </Route>
 
