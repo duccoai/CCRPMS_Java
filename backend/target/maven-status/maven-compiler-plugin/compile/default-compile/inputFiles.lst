@@ -33,6 +33,7 @@ D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\user\
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\auth\model\UserResponse.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\application\entity\ApplicationStatus.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\exam\entity\Submission.java
+D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\admin\dto\UserDTO.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\job\dto\JobRequestDTO.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\job\repository\JobRepository.java
 D:\HOC\Lap trinh Java\CCRPMS_Java\backend\src\main\java\com\academy\ccrpms\job\entity\JobStatus.java

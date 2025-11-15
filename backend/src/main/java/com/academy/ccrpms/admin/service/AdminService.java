@@ -1,6 +1,7 @@
 package com.academy.ccrpms.admin.service;
 
 import com.academy.ccrpms.admin.dto.AdminStatsDTO;
+import com.academy.ccrpms.admin.dto.UserDTO;
 import com.academy.ccrpms.application.entity.Application;
 import com.academy.ccrpms.application.entity.ApplicationStatus;
 import com.academy.ccrpms.application.repository.ApplicationRepository;
@@ -58,9 +59,17 @@ public class AdminService {
         return userRepository.save(u);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsersDTO() {
+        return userRepository.findAll().stream()
+                .map(u -> new UserDTO(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getEmail(),
+                    u.getRole() != null ? u.getRole().getName() : "N/A"
+                ))
+                .toList();
     }
+
 
     public List<Application> getAllApplications() {
         return applicationRepository.findAll();

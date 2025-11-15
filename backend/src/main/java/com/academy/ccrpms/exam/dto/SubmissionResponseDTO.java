@@ -12,6 +12,6 @@ public class SubmissionResponseDTO {
     private String examDescription; // ← thêm
     private String userName;
     private String userEmail;
-    private Integer score;
+    private double score;
     private String applicationStatus;
 }

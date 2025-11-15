@@ -21,7 +21,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String role = userDetails.getRoleName(); // "ADMIN", "CANDIDATE", "RECRUITER"
+        String role = userDetails.getUser().getRole().getName(); // "ADMIN", "CANDIDATE", "RECRUITER"
 
         // Redirect theo role
         if ("ADMIN".equals(role)) {

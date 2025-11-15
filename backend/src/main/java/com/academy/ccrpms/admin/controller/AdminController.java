@@ -1,6 +1,7 @@
 package com.academy.ccrpms.admin.controller;
 
 import com.academy.ccrpms.admin.dto.AdminStatsDTO;
+import com.academy.ccrpms.admin.dto.UserDTO;
 import com.academy.ccrpms.admin.service.AdminService;
 import com.academy.ccrpms.application.entity.Application;
 import com.academy.ccrpms.exam.entity.Exam;
@@ -21,9 +22,10 @@ public class AdminController {
 
     // ----------------- User Management -----------------
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllUsersDTO());
     }
+
 
     @PostMapping("/users/recruiter")
     public ResponseEntity<User> createRecruiter(@RequestBody User user) {

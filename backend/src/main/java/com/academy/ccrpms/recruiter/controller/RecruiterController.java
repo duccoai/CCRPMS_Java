@@ -48,7 +48,7 @@ public class RecruiterController {
         return ResponseEntity.ok(updated);
     }
 
-    // 3️⃣ Schedule interview
+    // @PostMapping("/interviews/schedule")
     @PostMapping("/interviews/schedule")
     public ResponseEntity<Interview> scheduleInterview(@RequestBody InterviewScheduleDTO dto) {
         Interview interview = dto.toEntity();
@@ -56,14 +56,19 @@ public class RecruiterController {
         return ResponseEntity.ok(saved);
     }
 
-    // 4️⃣ Update interview
     @PutMapping("/interviews")
     public ResponseEntity<Interview> updateInterview(@RequestBody InterviewUpdateDTO dto) {
-        Interview updated = recruiterService.updateInterview(dto);
+        Interview interview = dto.toEntity();
+        Interview updated = recruiterService.updateInterview(interview);
         return ResponseEntity.ok(updated);
     }
 
-    // 5️⃣ Score submission
+    @PostMapping("/interviews/{id}/score")
+    public ResponseEntity<Interview> scoreInterview(@PathVariable Long id, @RequestParam Double score) {
+        Interview updated = recruiterService.scoreInterview(id, score);
+        return ResponseEntity.ok(updated);
+    }
+
     @PostMapping("/submissions/{id}/score")
     public ResponseEntity<Void> scoreSubmission(@PathVariable Long id, @RequestParam Double score) {
         recruiterService.scoreSubmission(id, score);
