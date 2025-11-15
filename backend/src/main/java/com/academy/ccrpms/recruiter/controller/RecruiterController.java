@@ -66,15 +66,19 @@ public class RecruiterController {
     }
 
     // 5. Score submission (bài thi)
-    @PostMapping("/submissions/{id}/score")
-    public ResponseEntity<?> scoreSubmission(@PathVariable Long id, @RequestParam Double score) {
+    @PostMapping("/applications/{applicationId}/score-exam")
+    public ResponseEntity<?> scoreExam(@PathVariable Long applicationId, @RequestParam Double score) {
         try {
-            recruiterService.scoreSubmission(id, score);
+            recruiterService.scoreSubmissionByApplication(applicationId, score);
             return ResponseEntity.ok().build();
         } catch (RuntimeException ex) {
-            return ResponseEntity.status(404).body(Map.of("error", "SubmissionNotFound", "message", ex.getMessage()));
+            return ResponseEntity.status(404).body(Map.of(
+                "error", "SubmissionNotFound",
+                "message", ex.getMessage()
+            ));
         }
     }
+
 
     // 6. Lấy jobs của recruiter hiện tại
     @GetMapping("/jobs")

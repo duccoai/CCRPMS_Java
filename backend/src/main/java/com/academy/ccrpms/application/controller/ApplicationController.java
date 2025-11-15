@@ -36,6 +36,9 @@ public class ApplicationController {
     public ResponseEntity<List<ApplicationResponseDTO>> getMyApplications(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         Long userId = userDetails.getUser().getId();
         List<Application> apps = applicationService.getApplicationsByUser(userId);
         List<ApplicationResponseDTO> dtos = apps.stream()
@@ -43,5 +46,4 @@ public class ApplicationController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
-
 }

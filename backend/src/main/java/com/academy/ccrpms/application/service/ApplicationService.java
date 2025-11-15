@@ -4,8 +4,8 @@ import com.academy.ccrpms.application.entity.Application;
 import com.academy.ccrpms.application.entity.ApplicationStatus;
 import com.academy.ccrpms.application.repository.ApplicationRepository;
 import com.academy.ccrpms.job.repository.JobRepository;
-import com.academy.ccrpms.user.repository.UserRepository;
 import com.academy.ccrpms.user.entity.User;
+import com.academy.ccrpms.user.repository.UserRepository;
 import com.academy.ccrpms.exam.entity.Submission;
 import com.academy.ccrpms.exam.repository.SubmissionRepository;
 import com.academy.ccrpms.recruiter.entity.Interview;
@@ -26,28 +26,28 @@ public class ApplicationService {
     private final InterviewRepository interviewRepository;
 
     // Nộp hồ sơ ứng tuyển
-    public Application submitApplication(Long userId, Long jobId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    public Application submitApplication(Long candidateId, Long jobId) {
+        User candidate = userRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + candidateId));
         var job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
         Application app = new Application();
-        app.setUser(user);
+        app.setCandidate(candidate);
         app.setJob(job);
         app.setStatus(ApplicationStatus.PENDING);
 
         return applicationRepository.save(app);
     }
 
-    // Lấy danh sách hồ sơ của người dùng
-    public List<Application> getApplicationsByUser(Long userId) {
-        return applicationRepository.findByUser_Id(userId);
+    // Lấy danh sách hồ sơ của ứng viên
+    public List<Application> getApplicationsByCandidate(Long candidateId) {
+        return applicationRepository.findByCandidate_Id(candidateId);
     }
 
     // Theo dõi trạng thái hồ sơ
-    public List<Map<String, Object>> getApplicationStatuses(Long userId) {
-        List<Application> apps = getApplicationsByUser(userId);
+    public List<Map<String, Object>> getApplicationStatuses(Long candidateId) {
+        List<Application> apps = getApplicationsByCandidate(candidateId);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Application app : apps) {
@@ -58,9 +58,8 @@ public class ApplicationService {
             map.put("statusCode", app.getStatus() != null ? app.getStatus().name() : "UNKNOWN");
 
             String statusText;
-            if (app.getStatus() == null) {
-                statusText = "Không rõ trạng thái";
-            } else {
+            if (app.getStatus() == null) statusText = "Không rõ trạng thái";
+            else {
                 switch (app.getStatus()) {
                     case PENDING -> statusText = "Đang chờ duyệt";
                     case INTERVIEW -> statusText = "Được phỏng vấn";
@@ -77,9 +76,9 @@ public class ApplicationService {
     }
 
     // Xem kết quả tuyển dụng (điểm thi + trạng thái)
-    public List<Map<String, Object>> getApplicationResults(Long userId) {
-        List<Application> apps = getApplicationsByUser(userId);
-        List<Submission> submissions = submissionRepository.findByUser_Id(userId);
+    public List<Map<String, Object>> getApplicationResults(Long candidateId) {
+        List<Application> apps = getApplicationsByCandidate(candidateId);
+        List<Submission> submissions = submissionRepository.findByUser_Id(candidateId); // submission vẫn lưu User
         List<Map<String, Object>> results = new ArrayList<>();
 
         for (Application app : apps) {

@@ -4,6 +4,7 @@ import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.job.entity.Job;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.List;
 
 @Entity
@@ -22,23 +23,27 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String fullName;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     private boolean active = true;
 
-    // 🟩 Thêm 3 trường bị thiếu
+    // Thêm các trường phụ trợ
     private String avatarUrl;  // link ảnh đại diện
     private String bio;        // mô tả ngắn
     private String cvUrl;      // link CV của user
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
+    // Nếu user là recruiter, liên kết với Job
     @OneToMany(mappedBy = "recruiter", cascade = CascadeType.ALL)
     private List<Job> jobs;
 }

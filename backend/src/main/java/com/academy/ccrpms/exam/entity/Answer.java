@@ -21,4 +21,9 @@ public class Answer {
     @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
+
+    // ⭐ Thêm quan hệ với Submission
+    @ManyToOne
+    @JoinColumn(name = "submission_id")
+    private Submission submission;   // phải trùng tên với mappedBy trong Submission
 }

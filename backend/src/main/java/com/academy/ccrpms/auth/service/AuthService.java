@@ -27,48 +27,71 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+
     private final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-    // Đăng ký
+    // ========================== Đăng ký ==========================
     public User register(User user) {
+        // fix: role mặc định không null
         Role defaultRole = roleRepository.findByName("CANDIDATE")
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
         user.setRole(defaultRole);
+
+        // fix: mã hóa password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // fix: kiểm tra trùng username/email
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         return userRepository.save(user);
     }
 
-    // Đăng nhập (robust)
-    public LoginResponse login(LoginRequest request) {
+    // ========================== Đăng nhập ==========================
+        public LoginResponse login(LoginRequest request) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                );
 
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = userDetails.getUser();
+                CustomUserDetails userDetails;
+                try {
+                userDetails = (CustomUserDetails) authentication.getPrincipal();
+                } catch (ClassCastException e) {
+                throw new RuntimeException("Invalid user details returned by authentication manager");
+                }
 
-            String token = jwtService.generateToken(userDetails);
+                User user = userDetails.getUser();
+                if (user.getRole() == null) {
+                throw new RuntimeException("User role not assigned");
+                }
 
-            UserResponse.RoleResponse roleResponse = new UserResponse.RoleResponse(
-                    user.getRole().getId(),
-                    user.getRole().getName()
-            );
+                String token = jwtService.generateToken(userDetails);
 
-            UserResponse userResponse = new UserResponse(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getFullName(),
-                    roleResponse
-            );
+                UserResponse.RoleResponse roleResponse = new UserResponse.RoleResponse(
+                        user.getRole().getId(),
+                        user.getRole().getName().toUpperCase() // chuẩn hóa role
+                );
 
-            return new LoginResponse(token, userResponse);
+                UserResponse userResponse = new UserResponse(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getFullName(),
+                        roleResponse
+                );
+
+                return new LoginResponse(token, userResponse);
         } catch (BadCredentialsException bce) {
-            log.warn("Bad credentials for user {}", request.getUsername());
-            throw new RuntimeException("Bad credentials");
+                log.warn("Bad credentials for user {}", request.getUsername());
+                throw new RuntimeException("Bad credentials");
         } catch (Exception ex) {
-            log.error("Error during login for user " + request.getUsername(), ex);
-            throw new RuntimeException("Login failed: " + ex.getMessage());
+                log.error("Error during login for user " + request.getUsername(), ex);
+                throw new RuntimeException("Login failed: " + ex.getMessage());
         }
-    }
+        }
+
 }

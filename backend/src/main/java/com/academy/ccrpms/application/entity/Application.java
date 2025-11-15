@@ -3,6 +3,7 @@ package com.academy.ccrpms.application.entity;
 import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.job.entity.Job;
 import com.academy.ccrpms.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,19 +21,20 @@ public class Application extends BaseEntity {
     private Long id;
 
     // Người nộp hồ sơ (Ứng viên)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user;
+    @JsonIgnoreProperties({"applications", "jobs"})
+    private User candidate;
 
     // Vị trí ứng tuyển
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "job_id")
-    private Job job; // phải import com.academy.ccrpms.job.entity.Job
+    @JsonIgnoreProperties({"recruiter", "applications"})
+    private Job job;
 
     // Trạng thái hồ sơ
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.PENDING;
-
 }

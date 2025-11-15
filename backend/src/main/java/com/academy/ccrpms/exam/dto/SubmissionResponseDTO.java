@@ -8,11 +8,10 @@ import java.time.OffsetDateTime;
 @Data
 @Builder
 public class SubmissionResponseDTO {
-
     private Long submissionId;
-    private Long userId;
-    private Long applicationId;
-    private Double score;
-    private OffsetDateTime createdAt;
-    private Object answers; // giữ raw answers hoặc DTO
+    private String examDescription; // ← thêm
+    private String userName;
+    private String userEmail;
+    private Integer score;
+    private String applicationStatus;
 }

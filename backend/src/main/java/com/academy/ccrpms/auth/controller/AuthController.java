@@ -25,7 +25,9 @@ public class AuthController {
             return ResponseEntity.ok(saved);
         } catch (Exception ex) {
             log.error("Register failed", ex);
-            return ResponseEntity.status(500).body(ex.getMessage());
+            return ResponseEntity
+                    .status(500)
+                    .body(new ErrorResponse("REGISTER_FAILED", ex.getMessage()));
         }
     }
 
@@ -34,19 +36,25 @@ public class AuthController {
         try {
             LoginResponse resp = authService.login(request);
             return ResponseEntity.ok(resp);
-        } catch (Exception ex) {
-            // log stacktrace (GlobalExceptionHandler also catches, but log earlier helps)
-            log.error("Login failed", ex);
-            // Return a clear message and 401 for authentication problems, otherwise 500
-            String msg = ex.getMessage() != null ? ex.getMessage() : "Login failed";
-            return ResponseEntity.status(500).body(new ErrorResponse("LOGIN_FAILED", msg));
+        } catch (RuntimeException ex) {
+            log.error("Login failed for user {}", request.getUsername(), ex);
+            return ResponseEntity.status(500)
+                    .body(new AuthController.ErrorResponse("LOGIN_FAILED", ex.getMessage()));
         }
     }
 
-    // small helper class used in response
+
+    // Helper class để gửi lỗi chuẩn
     public static class ErrorResponse {
-        public String code;
-        public String message;
-        public ErrorResponse(String c, String m) { this.code = c; this.message = m; }
+        private String code;
+        private String message;
+
+        public ErrorResponse(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() { return code; }
+        public String getMessage() { return message; }
     }
 }

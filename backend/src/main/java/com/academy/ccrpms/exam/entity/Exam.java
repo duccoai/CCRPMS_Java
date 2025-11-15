@@ -24,4 +24,16 @@ public class Exam extends BaseEntity {
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions;
+
+    // New field for active status
+    private boolean active = true;
+
+    // Getter and Setter for active field
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

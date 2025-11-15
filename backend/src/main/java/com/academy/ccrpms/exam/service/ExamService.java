@@ -8,10 +8,10 @@ import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
@@ -23,44 +23,42 @@ public class ExamService {
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
 
-    public Submission submitExam(Long userId, Long examId, Map<Long, String> answers) {
-        System.out.println(">>> submitExam() called for userId=" + userId + ", examId=" + examId);
+public Submission submitExam(Long userId, Long examId, Map<Long, String> answers) {
+    System.out.println(">>> submitExam() called for userId=" + userId + ", examId=" + examId);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    Exam exam = examRepository.findById(examId)
+            .orElseThrow(() -> new RuntimeException("Exam not found"));
 
-        Application app = applicationRepository.findByUser_ID(user).stream()
-                .findFirst()
-                .orElse(null);
+    // Lấy application của user liên quan đến job của exam
+    Application app = applicationRepository.findByUser(user)
+            .stream()
+            .findFirst()
+            .orElse(null);
 
-        List<Question> questions = questionRepository.findAll();
 
-        int total = 0;
-        int correct = 0;
+    // Tính điểm
+    List<Question> questions = questionRepository.findByExamId(examId);
+    int total = questions.size();
+    long correct = questions.stream()
+            .filter(q -> answers.get(q.getId()) != null &&
+                         answers.get(q.getId()).equalsIgnoreCase(q.getCorrectAnswer()))
+            .count();
 
-        for (Question q : questions) {
-            if (q.getExam().getId().equals(examId)) {
-                total++;
-                String userAnswer = answers.get(q.getId());
-                if (userAnswer != null && userAnswer.equalsIgnoreCase(q.getCorrectAnswer())) {
-                    correct++;
-                }
-            }
-        }
+    double score = total > 0 ? (double) correct / total * 100.0 : 0.0;
 
-        double score = (double) correct / total * 100.0;
+    // Tạo submission liên kết đúng application
+    Submission submission = Submission.builder()
+            .user(user)
+            .exam(exam)
+            .application(app)
+            .score(score)
+            .build();
 
-        Submission submission = Submission.builder()
-                .user(user)
-                .exam(exam)
-                .application(app)
-                .score(score)
-                .build();
+    return submissionRepository.save(submission);
+}
 
-        return submissionRepository.save(submission);
-    }
 
         // 🟩 Hàm lấy dữ liệu bài thi
     public Map<String, Object> startExam(Long examId) {

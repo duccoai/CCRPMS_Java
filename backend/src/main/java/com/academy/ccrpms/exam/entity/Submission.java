@@ -5,6 +5,7 @@ import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "submissions")
@@ -22,7 +23,7 @@ public class Submission extends BaseEntity {
     private double score;
 
     @ManyToOne
-    @JoinColumn(name = "Exam_id")
+    @JoinColumn(name = "exam_id")
     private Exam exam;
 
     @ManyToOne
@@ -32,4 +33,8 @@ public class Submission extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "application_id")
     private Application application;
+
+    // ⭐ Thêm answers nếu chưa có
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answer> answers;
 }

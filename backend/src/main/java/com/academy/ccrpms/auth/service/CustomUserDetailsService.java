@@ -1,8 +1,9 @@
 package com.academy.ccrpms.auth.service;
 
-import com.academy.ccrpms.auth.model.CustomUserDetails;
 import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.UserRepository;
+import com.academy.ccrpms.auth.model.CustomUserDetails;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,10 +17,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public CustomUserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         return new CustomUserDetails(user);
     }
-
 }
