@@ -1,9 +1,11 @@
+// src/pages/candidate/JobDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import "./Candidate.css";
 
 export default function JobDetail() {
-  const { id } = useParams(); // jobId
+  const { id } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +19,7 @@ export default function JobDetail() {
 
   function handleApply() {
     api.post(`/applications/submit/${id}`)
-      .then(res => {
+      .then(() => {
         alert("Nộp hồ sơ thành công!");
         navigate("/applications");
       })
@@ -27,17 +29,16 @@ export default function JobDetail() {
       });
   }
 
-
-  if (loading) return <div style={{padding:20}}>Loading…</div>;
-  if (!job) return <div style={{padding:20}}>Job not found</div>;
+  if (loading) return <div className="candidate-container">Loading…</div>;
+  if (!job) return <div className="candidate-container">Job not found</div>;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="candidate-container">
       <h2>{job.title}</h2>
       <p>{job.description}</p>
       <p><b>Location:</b> {job.location || "—"}</p>
       <p><b>Salary:</b> {job.salaryRange || "—"}</p>
-      <button onClick={handleApply}>Nộp hồ sơ</button>
+      <button className="candidate-btn" onClick={handleApply}>Nộp hồ sơ</button>
     </div>
   );
 }

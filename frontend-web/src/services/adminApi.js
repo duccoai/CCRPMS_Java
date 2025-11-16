@@ -3,7 +3,7 @@ import axios from "./api";  // giữ dòng này, bỏ dòng kia
 // ==========================
 //  Người dùng (Admin)
 // ==========================
-export const getAllUsers = () => axios.get("/admin/users");
+export const getAllUsers = () => axios.get("/admin/users"); // đảm bảo không thêm /api nữa nếu instance có baseURL
 export const createRecruiter = (data) => axios.post("/admin/users/recruiter", data);
 
 // ==========================

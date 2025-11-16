@@ -1,27 +1,44 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { getAdminStats } from "../../services/adminApi";
+import "./AdminTable.css";
 
 export default function AdminReports() {
-  const [stats, setStats] = useState({ totalCandidates: 0, totalApplications: 0, passed: 0, failed: 0 });
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const fetchStats = async () => {
-    try {
-      const res = await axios.get("/api/admin/statistics");
-      setStats(res.data || { totalCandidates: 0, totalApplications: 0, passed: 0, failed: 0 });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  useEffect(() => {
+    getAdminStats()
+      .then((res) => setStats(res.data))
+      .catch((err) => console.error("Fetch stats error:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
-  useEffect(() => { fetchStats(); }, []);
+  if (loading) return <p>Loading...</p>;
+  if (!stats) return <p>Không có dữ liệu thống kê</p>;
 
   return (
-    <div>
-      <h2>Báo cáo</h2>
-      <p>Tổng số ứng viên: {stats.totalCandidates}</p>
-      <p>Tổng số hồ sơ: {stats.totalApplications}</p>
-      <p>Số pass: {stats.passed}</p>
-      <p>Số fail: {stats.failed}</p>
+    <div className="admin-table-wrapper">
+      <h1>📊 Báo cáo tổng quan</h1>
+      <table className="admin-table">
+        <tbody>
+          <tr>
+            <td>Tổng số ứng viên</td>
+            <td>{stats.totalCandidates}</td>
+          </tr>
+          <tr>
+            <td>Tổng hồ sơ</td>
+            <td>{stats.totalApplications}</td>
+          </tr>
+          <tr>
+            <td>Số hồ sơ được duyệt</td>
+            <td>{stats.passed}</td>
+          </tr>
+          <tr>
+            <td>Số hồ sơ trượt</td>
+            <td>{stats.failed}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }

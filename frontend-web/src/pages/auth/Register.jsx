@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/api";
+import "./Auth.css";
 
 export default function Register() {
   const [form, setForm] = useState({ username: "", password: "", email: "" });
@@ -20,35 +21,51 @@ export default function Register() {
   }
 
   return (
-    <div style={styles.container}>
-      <h2>Đăng ký</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          placeholder="Username"
-          value={form.username}
-          onChange={e => setForm({ ...form, username: e.target.value })}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-        />
-        {error && <div style={{ color: "red" }}>{error}</div>}
-        <button type="submit">Đăng ký</button>
-      </form>
-      <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Đăng ký</h2>
+        <p className="auth-subtitle">Create your account</p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="auth-input">
+            <label>Username</label>
+            <input
+              placeholder="Username"
+              value={form.username}
+              onChange={e => setForm({ ...form, username: e.target.value })}
+            />
+          </div>
+
+          <div className="auth-input">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+
+          <div className="auth-input">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <button className="auth-btn" type="submit">Đăng ký</button>
+        </form>
+
+        <p className="auth-switch">
+          Đã có tài khoản?
+          <Link to="/login"> Đăng nhập</Link>
+        </p>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  container: { padding: 20, maxWidth: 400, margin: "40px auto", textAlign: "center" },
-  form: { display: "flex", flexDirection: "column", gap: 10 },
-};

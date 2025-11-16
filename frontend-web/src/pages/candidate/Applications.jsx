@@ -1,6 +1,7 @@
 // src/pages/candidate/Applications.jsx
 import { useEffect, useState } from "react";
 import api from "../../api/api";
+import "./Candidate.css";
 
 export default function ApplicationsPage() {
   const [apps, setApps] = useState([]);
@@ -12,7 +13,6 @@ export default function ApplicationsPage() {
     api.get("/applications/user/me")
       .then(res => {
         const data = res.data || [];
-        // nếu backend trả object wrap: adjust here
         setApps(Array.isArray(data) ? data : (data.items || []));
       })
       .catch(e => {
@@ -22,14 +22,14 @@ export default function ApplicationsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{padding:20}}>Đang tải…</div>;
-  if (err) return <div style={{padding:20,color:'red'}}>Lỗi khi tải hồ sơ (xem console)</div>;
-  if (!apps.length) return <div style={{padding:20}}>Bạn chưa nộp hồ sơ nào.</div>;
+  if (loading) return <div className="candidate-container">Đang tải…</div>;
+  if (err) return <div className="candidate-container error">Lỗi khi tải hồ sơ (xem console)</div>;
+  if (!apps.length) return <div className="candidate-container">Bạn chưa nộp hồ sơ nào.</div>;
 
   return (
-    <div style={{padding:20}}>
+    <div className="candidate-container">
       <h2>Hồ sơ đã nộp</h2>
-      <table style={{width:'100%',borderCollapse:'collapse'}}>
+      <table className="candidate-table">
         <thead>
           <tr>
             <th>Job</th>
@@ -41,7 +41,7 @@ export default function ApplicationsPage() {
           {apps.map(a => (
             <tr key={a.id || a.applicationId}>
               <td>{a.job?.title || a.jobTitle || "—"}</td>
-              <td>{a.status || (a.statusCode) || "—"}</td>
+              <td>{a.status || a.statusCode || "—"}</td>
               <td>{a.createdAt ? new Date(a.createdAt).toLocaleString() : (a.submittedAt ? new Date(a.submittedAt).toLocaleString() : "—")}</td>
             </tr>
           ))}

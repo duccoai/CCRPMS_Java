@@ -1,0 +1,51 @@
+.recruiter-table-wrapper {
+  padding: 16px;
+}
+
+.recruiter-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recruiter-table th,
+.recruiter-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.recruiter-table th {
+  background: #f5f5f5;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-pending { background: gray; }
+.status-interviewing { background: orange; }
+.status-approved { background: green; }
+.status-rejected { background: red; }
+.status-hired { background: blue; }
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-buttons button,
+.action-buttons select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.action-buttons button:hover {
+  background: #eee;
+}

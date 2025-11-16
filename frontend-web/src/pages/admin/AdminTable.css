@@ -1,0 +1,93 @@
+.admin-table-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-table-wrapper h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* TABLE */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6e6e6;
+  text-align: left;
+}
+
+.admin-table th {
+  background: #f5f6fa;
+  font-weight: 600;
+  color: #3b3e46;
+}
+
+/* STATUS BADGES */
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-pass {
+  background: #d4f8df;
+  color: #218838;
+}
+
+.status-reject {
+  background: #ffd3d3;
+  color: #c82333;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #b8860b;
+}
+
+/* ROLE BADGE */
+.role-badge {
+  background: #e4e8ff;
+  color: #2d45d0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* BUTTONS */
+.btn-pass,
+.btn-reject {
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.btn-pass {
+  background: #28a745;
+  color: white;
+}
+
+.btn-reject {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-pass:hover {
+  background: #218838;
+}
+
+.btn-reject:hover {
+  background: #b91d2a;
+}

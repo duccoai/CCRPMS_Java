@@ -1,13 +1,23 @@
 import React from "react";
 import Sidebar from "./Sidebar";
+import "./AdminLayout.css";
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="admin-layout" style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="admin-layout">
+      
       <Sidebar />
-      <main style={{ flex: 1, padding: "20px" }}>
-        {children}
-      </main>
+
+      <div className="admin-main">
+        <header className="admin-navbar">
+          <h2>Administrator Panel</h2>
+        </header>
+
+        <main className="admin-content">
+          {children}
+        </main>
+      </div>
+
     </div>
   );
 }

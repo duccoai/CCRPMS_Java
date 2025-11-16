@@ -1,18 +1,22 @@
+// src/pages/candidate/Results.jsx
 import { useEffect, useState } from "react";
 import api from "../../api/api";
+import "./Candidate.css";
 
 export default function Results() {
   const [results, setResults] = useState([]);
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    api.get(`/applications/result/${userId}`).then(res => setResults(res.data));
-  }, []);
+    api.get(`/applications/result/${userId}`).then(res => setResults(res.data || []));
+  }, [userId]);
+
+  if (!results.length) return <div className="candidate-container">Chưa có kết quả.</div>;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="candidate-container">
       <h2>Kết quả tuyển dụng</h2>
-      <table style={styles.table}>
+      <table className="candidate-table">
         <thead>
           <tr>
             <th>Vị trí</th>
@@ -33,10 +37,3 @@ export default function Results() {
     </div>
   );
 }
-
-const styles = {
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-};
