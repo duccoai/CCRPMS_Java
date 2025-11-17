@@ -19,9 +19,16 @@ public class Question extends BaseEntity {
 
     private String content;
 
+    @Column(name = "option_a")
     private String optionA;
+
+    @Column(name = "option_b")
     private String optionB;
+
+    @Column(name = "option_c")
     private String optionC;
+
+    @Column(name = "option_d")
     private String optionD;
 
     private String correctAnswer; // ví dụ: "A"

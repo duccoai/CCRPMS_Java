@@ -37,4 +37,8 @@ public class Application extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.PENDING;
+
+    // URL CV (nếu có)
+    private String cvUrl;
+
 }

@@ -25,10 +25,17 @@ public class ApplicationService {
     private final SubmissionRepository submissionRepository;
     private final InterviewRepository interviewRepository;
 
-    // Nộp hồ sơ ứng tuyển
+    /**
+     * Nộp hồ sơ ứng tuyển cho một job.
+     *
+     * @param candidateId ID của candidate
+     * @param jobId       ID của job
+     * @return Application vừa tạo
+     */
     public Application submitApplication(Long candidateId, Long jobId) {
         User candidate = userRepository.findById(candidateId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + candidateId));
+
         var job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
 
@@ -40,12 +47,22 @@ public class ApplicationService {
         return applicationRepository.save(app);
     }
 
-    // Lấy danh sách hồ sơ của ứng viên
+    /**
+     * Lấy danh sách hồ sơ của ứng viên
+     *
+     * @param candidateId ID của candidate
+     * @return danh sách Application
+     */
     public List<Application> getApplicationsByCandidate(Long candidateId) {
         return applicationRepository.findByCandidate_Id(candidateId);
     }
 
-    // Theo dõi trạng thái hồ sơ
+    /**
+     * Theo dõi trạng thái hồ sơ ứng viên
+     *
+     * @param candidateId ID của candidate
+     * @return danh sách map thông tin trạng thái hồ sơ
+     */
     public List<Map<String, Object>> getApplicationStatuses(Long candidateId) {
         List<Application> apps = getApplicationsByCandidate(candidateId);
         List<Map<String, Object>> result = new ArrayList<>();
@@ -58,8 +75,9 @@ public class ApplicationService {
             map.put("statusCode", app.getStatus() != null ? app.getStatus().name() : "UNKNOWN");
 
             String statusText;
-            if (app.getStatus() == null) statusText = "Không rõ trạng thái";
-            else {
+            if (app.getStatus() == null) {
+                statusText = "Không rõ trạng thái";
+            } else {
                 switch (app.getStatus()) {
                     case PENDING -> statusText = "Đang chờ duyệt";
                     case INTERVIEW -> statusText = "Được phỏng vấn";
@@ -72,10 +90,16 @@ public class ApplicationService {
             map.put("status", statusText);
             result.add(map);
         }
+
         return result;
     }
 
-    // Xem kết quả tuyển dụng (điểm thi + trạng thái)
+    /**
+     * Xem kết quả tuyển dụng (kết hợp điểm thi + trạng thái)
+     *
+     * @param candidateId ID của candidate
+     * @return danh sách map thông tin kết quả tuyển dụng
+     */
     public List<Map<String, Object>> getApplicationResults(Long candidateId) {
         List<Application> apps = getApplicationsByCandidate(candidateId);
         List<Submission> submissions = submissionRepository.findByUser_Id(candidateId); // submission vẫn lưu User
@@ -91,7 +115,8 @@ public class ApplicationService {
             // Submission mới nhất
             Submission submission = submissions.stream()
                     .filter(s -> s.getApplication() != null && s.getApplication().getId().equals(app.getId()))
-                    .findFirst().orElse(null);
+                    .findFirst()
+                    .orElse(null);
             map.put("examScore", submission != null ? submission.getScore() : null);
 
             // Interview mới nhất
@@ -100,9 +125,11 @@ public class ApplicationService {
                     .findFirst();
             map.put("interviewScore", interview.map(Interview::getScore).orElse(null));
 
+            // Kết quả cuối cùng
             String finalResult;
-            if (app.getStatus() == null) finalResult = "Không rõ trạng thái";
-            else {
+            if (app.getStatus() == null) {
+                finalResult = "Không rõ trạng thái";
+            } else {
                 switch (app.getStatus()) {
                     case HIRED -> finalResult = "Đỗ";
                     case REJECTED -> finalResult = "Trượt";
@@ -115,6 +142,7 @@ public class ApplicationService {
 
             results.add(map);
         }
+
         return results;
     }
 }

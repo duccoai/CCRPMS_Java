@@ -16,14 +16,14 @@ public class Answer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String text;
+    private String text; // đáp án người chọn
 
     @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
 
-    // ⭐ Thêm quan hệ với Submission
+    // liên kết với Submission
     @ManyToOne
     @JoinColumn(name = "submission_id")
-    private Submission submission;   // phải trùng tên với mappedBy trong Submission
+    private Submission submission;
 }

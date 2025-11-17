@@ -19,19 +19,35 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    // Nộp hồ sơ → chỉ cần jobId, candidate lấy từ token
+    /**
+     * Nộp hồ sơ cho một job.
+     * Candidate được lấy từ token.
+     *
+     * @param userDetails thông tin user hiện tại
+     * @param jobId       id của job muốn nộp hồ sơ
+     * @return ApplicationResponseDTO của hồ sơ vừa nộp
+     */
     @PostMapping("/submit/{jobId}")
     public ResponseEntity<ApplicationResponseDTO> submit(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long jobId
     ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         Application app = applicationService.submitApplication(userDetails.getId(), jobId);
         ApplicationResponseDTO dto = ApplicationResponseDTO.fromEntity(app);
+
         return ResponseEntity.ok(dto);
     }
 
-
-    // Lấy hồ sơ user hiện tại
+    /**
+     * Lấy tất cả hồ sơ của user hiện tại.
+     *
+     * @param userDetails thông tin user hiện tại
+     * @return danh sách ApplicationResponseDTO
+     */
     @GetMapping("/user/me")
     public ResponseEntity<List<ApplicationResponseDTO>> getMyApplications(
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -39,11 +55,13 @@ public class ApplicationController {
         if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
+
         Long userId = userDetails.getUser().getId();
         List<Application> apps = applicationService.getApplicationsByCandidate(userId);
         List<ApplicationResponseDTO> dtos = apps.stream()
                 .map(ApplicationResponseDTO::fromEntity)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtos);
     }
 }

@@ -34,7 +34,6 @@ public class Submission extends BaseEntity {
     @JoinColumn(name = "application_id")
     private Application application;
 
-    // ⭐ Thêm answers nếu chưa có
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Answer> answers;
 }
