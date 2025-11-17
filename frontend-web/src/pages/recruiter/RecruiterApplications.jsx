@@ -12,6 +12,7 @@ export default function RecruiterApplications() {
     loadApplications();
   }, []);
 
+  // Load danh sách applications
   async function loadApplications() {
     setLoading(true);
     try {
@@ -25,15 +26,21 @@ export default function RecruiterApplications() {
     }
   }
 
+  // Helper functions
   const getAppId = (app) => app.applicationId || app.id;
   const getCandidateName = (app) =>
-    app.candidateFullName || app.candidateUsername || (app.user && (app.user.fullName || app.user.username)) || "—";
+    app.candidateFullName ||
+    app.candidateUsername ||
+    (app.user && (app.user.fullName || app.user.username)) ||
+    "—";
   const getCandidateEmail = (app) => app.candidateEmail || (app.user && app.user.email) || "—";
   const getJobTitle = (app) => app.jobTitle || (app.job && app.job.title) || "—";
   const getStatus = (app) => app.status || "PENDING";
   const getExamScore = (app) => (app.examScore !== null && app.examScore !== undefined ? app.examScore : "-");
-  const getInterviewScore = (app) => (app.interviewScore !== null && app.interviewScore !== undefined ? app.interviewScore : "-");
+  const getInterviewScore = (app) =>
+    app.interviewScore !== null && app.interviewScore !== undefined ? app.interviewScore : "-";
 
+  // Thay đổi trạng thái application
   async function changeStatus(app, status) {
     const appId = getAppId(app);
     if (!appId) return alert("Application ID không xác định");
@@ -48,6 +55,7 @@ export default function RecruiterApplications() {
     }
   }
 
+  // Lên lịch phỏng vấn
   async function scheduleInterview(app) {
     const appId = getAppId(app);
     if (!appId) return alert("Application ID không xác định");
@@ -73,6 +81,7 @@ export default function RecruiterApplications() {
     }
   }
 
+  // Chấm điểm phỏng vấn
   async function scoreInterview(app) {
     const interviewId = app.interviewId || app.interview?.id;
     if (!interviewId) return alert("Không tìm thấy interviewId (hãy schedule trước)");
@@ -91,6 +100,7 @@ export default function RecruiterApplications() {
     }
   }
 
+  // Chấm điểm bài thi
   async function scoreExam(app) {
     const appId = getAppId(app);
     if (!appId) return alert("Application ID không xác định");

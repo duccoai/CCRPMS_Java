@@ -47,7 +47,8 @@ export default function App() {
         <Route path="/jobs" element={<PrivateRoute><JobList /></PrivateRoute>} />
         <Route path="/jobs/:id" element={<PrivateRoute><JobDetail /></PrivateRoute>} />
         <Route path="/applications" element={<PrivateRoute><Applications /></PrivateRoute>} />
-        <Route path="/exam" element={<PrivateRoute><ExamPage /></PrivateRoute>} />
+        <Route path="/exam" element={<Navigate to="/exam/1" replace />} />
+        <Route path="/exam/:examId" element={<PrivateRoute><ExamPage /></PrivateRoute>} />
         <Route path="/results" element={<PrivateRoute><Results /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 

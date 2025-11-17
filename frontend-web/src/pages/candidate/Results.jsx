@@ -8,14 +8,23 @@ export default function Results() {
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    api.get(`/applications/result/${userId}`).then(res => setResults(res.data || []));
+    if (!userId) return;
+
+    api.get(`/exams/result/${userId}`)
+      .then(res => setResults(res.data || []))
+      .catch(err => {
+        console.error("Failed to load results:", err);
+        alert("Không thể tải kết quả. Vui lòng thử lại sau.");
+      });
   }, [userId]);
 
-  if (!results.length) return <div className="candidate-container">Chưa có kết quả.</div>;
+  if (!results.length)
+    return <div className="candidate-container">Chưa có kết quả.</div>;
 
   return (
     <div className="candidate-container">
       <h2>Kết quả tuyển dụng</h2>
+
       <table className="candidate-table">
         <thead>
           <tr>
@@ -24,6 +33,7 @@ export default function Results() {
             <th>Trạng thái</th>
           </tr>
         </thead>
+
         <tbody>
           {results.map((r, i) => (
             <tr key={i}>
