@@ -20,15 +20,13 @@ public class Exam extends BaseEntity {
     @Column(length = 2000)
     private String description;
 
-    private int duration; // thời gian làm bài (phút)
+    private int duration;
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions;
 
-    // New field for active status
     private boolean active = true;
 
-    // Getter and Setter for active field
     public boolean isActive() {
         return active;
     }

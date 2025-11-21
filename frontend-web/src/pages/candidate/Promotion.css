@@ -1,0 +1,155 @@
+/* src/pages/candidate/Candidate.css */
+
+.candidate-promotion-status-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.candidate-promotion-status-wrapper h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.candidate-promotion-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.candidate-promotion-table th,
+.candidate-promotion-table td {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.candidate-promotion-table th {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: 600;
+}
+
+.candidate-promotion-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.candidate-promotion-table tr:hover {
+  background-color: #e0f7fa;
+}
+
+.candidate-promotion-table td {
+  color: #555;
+}
+
+/* Responsive: scroll table on small screens */
+@media (max-width: 768px) {
+  .candidate-promotion-status-wrapper {
+    padding: 10px;
+  }
+
+  .candidate-promotion-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .candidate-promotion-table th,
+  .candidate-promotion-table td {
+    padding: 8px 12px;
+  }
+}
+
+/* ---------- CandidatePromotion Styles ---------- */
+
+.candidate-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.candidate-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Form layout */
+.promotion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.promotion-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #444;
+}
+
+.promotion-form input[type="number"],
+.promotion-form textarea {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 40px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.promotion-form input[type="number"]:focus,
+.promotion-form textarea:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
+  outline: none;
+}
+
+/* Button style */
+.promotion-form button {
+  padding: 12px 20px;
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.promotion-form button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.promotion-form button:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .candidate-container {
+    padding: 15px;
+  }
+
+  .promotion-form input[type="number"],
+  .promotion-form textarea {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .promotion-form button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}

@@ -5,6 +5,8 @@ import com.academy.ccrpms.common.BaseEntity;
 import com.academy.ccrpms.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,6 +23,11 @@ public class Submission extends BaseEntity {
     private Long id;
 
     private double score;
+
+    private LocalDateTime submittedAt;   // ⭐ MUST HAVE
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String answersJson;          // ⭐ MUST HAVE
 
     @ManyToOne
     @JoinColumn(name = "exam_id")

@@ -56,3 +56,67 @@
 .job-card { border: 1px solid #e6e6e6; padding: 12px; border-radius: 8px; background: #fff; }
 .job-meta { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
 .job-meta span { color: #666; font-size: 14px; }
+
+
+/* cho PromotionPage */
+.promotion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+}
+
+.promotion-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.promotion-form input,
+.promotion-form textarea {
+  padding: 8px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.promotion-form button {
+  width: 120px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.promotion-form button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+
+
+
+.notifications-container {
+  padding: 20px;
+}
+
+.notifications-container h2 {
+  margin-bottom: 15px;
+}
+
+.notification-item {
+  background: #f3f3f3;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.notification-item h4 {
+  margin: 0 0 5px 0;
+}
+
+.notification-item small {
+  color: #666;
+}

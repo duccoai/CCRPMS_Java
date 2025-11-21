@@ -7,16 +7,26 @@ import java.time.LocalDateTime;
 
 @Data
 public class InterviewScheduleDTO {
+
     private Long applicationId;
-    private LocalDateTime interviewDate;
+
+    // 🔥 Sửa: dùng 'date' thay vì 'interviewDate'
+    // Và dùng LocalDateTime để Spring/Jackson parse ISO-8601 tự động
+    private LocalDateTime date;
+
     private String location;
-    private String note; // optional
+
+    private String note;
 
     public Interview toEntity() {
         Interview interview = new Interview();
-        interview.setInterviewDate(this.interviewDate);
+
+        // 🔥 Sửa theo field mới
+        interview.setInterviewDate(this.date);
+
         interview.setLocation(this.location);
         interview.setNote(this.note);
+
         return interview;
     }
 }

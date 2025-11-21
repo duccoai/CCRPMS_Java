@@ -12,12 +12,13 @@ import com.academy.ccrpms.exam.repository.QuestionRepository;
 import com.academy.ccrpms.exam.repository.SubmissionRepository;
 import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,11 @@ public class ExamService {
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
 
-    // -----------------------------------------------------
-    // 1) Nộp bài + chấm điểm
-    // -----------------------------------------------------
-    public Submission submitExam(Long userId, Long examId, Map<Long, String> userAnswers) {
-
-        if (userAnswers == null) userAnswers = new HashMap<>();
+    // ---------------------------
+    // Submit exam + update Application
+    // ---------------------------
+    @Transactional
+    public Submission submitExam(Long userId, Long examId, Map<String, String> answers, Long applicationId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -43,50 +43,43 @@ public class ExamService {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
-        Application application = applicationRepository.findByCandidate(user)
-                .stream().findFirst().orElse(null);
+        if (answers == null) answers = new HashMap<>();
 
-        List<Question> questions = questionRepository.findByExamId(examId);
+        // Tính điểm
+        int score = calculateScore(exam, answers);
 
-        int total = questions.size();
+        // Tạo submission
+        Submission submission = Submission.builder()
+                .user(user)
+                .exam(exam)
+                .score(score)
+                .submittedAt(LocalDateTime.now())
+                .answersJson(convertAnswersToJson(answers))
+                .build();
 
-        long correct = questions.stream()
-                .filter(q ->
-                        userAnswers.containsKey(q.getId()) &&
-                        userAnswers.get(q.getId()).equalsIgnoreCase(q.getCorrectAnswer())
-                )
-                .count();
+        // Nếu có application → gắn và cập nhật điểm
+        if (applicationId != null) {
+            Application app = applicationRepository.findById(applicationId)
+                    .orElseThrow(() -> new RuntimeException("Application not found"));
 
-        double score = (total > 0) ? (double) correct / total * 100 : 0;
+            submission.setApplication(app);
 
-        Submission submission = submissionRepository.save(
-                Submission.builder()
-                        .user(user)
-                        .exam(exam)
-                        .application(application)
-                        .score(score)
-                        .build()
-        );
-
-        // Lưu từng câu trả lời
-        for (Question q : questions) {
-            String chosen = userAnswers.get(q.getId());
-
-            Answer ans = Answer.builder()
-                    .question(q)
-                    .submission(submission)
-                    .text(chosen)
-                    .build();
-
-            answerRepository.save(ans);
+            // Cập nhật điểm vào application
+            app.setScoreExam((double) score);
+            applicationRepository.save(app);
         }
+
+        submission = submissionRepository.save(submission);
+
+        // Lưu từng answer
+        saveAnswersEntities(submission, answers);
 
         return submission;
     }
 
-    // -----------------------------------------------------
-    // 2) Load đề thi (ĐÃ SỬA THEO YÊU CẦU)
-    // -----------------------------------------------------
+    // ---------------------------
+    // Start exam
+    // ---------------------------
     public Map<String, Object> startExam(Long examId) {
 
         Exam exam = examRepository.findById(examId)
@@ -94,27 +87,70 @@ public class ExamService {
 
         List<Question> questions = questionRepository.findByExamId(examId);
 
-        // Convert Question -> Map với fallback ""
-        List<Map<String, Object>> questionList = questions.stream()
-                .map(q -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("id", q.getId());
-                    m.put("content", q.getContent());
-                    m.put("optionA", q.getOptionA() != null ? q.getOptionA() : "");
-                    m.put("optionB", q.getOptionB() != null ? q.getOptionB() : "");
-                    m.put("optionC", q.getOptionC() != null ? q.getOptionC() : "");
-                    m.put("optionD", q.getOptionD() != null ? q.getOptionD() : "");
-                    m.put("correctAnswer", q.getCorrectAnswer() != null ? q.getCorrectAnswer() : "");
-                    return m;
+        List<Map<String, Object>> qList = new ArrayList<>();
+        for (Question q : questions) {
+            Map<String, Object> qMap = new HashMap<>();
+            qMap.put("id", q.getId());
+            qMap.put("content", q.getContent());
+            qMap.put("optionA", q.getOptionA() != null ? q.getOptionA() : "");
+            qMap.put("optionB", q.getOptionB() != null ? q.getOptionB() : "");
+            qMap.put("optionC", q.getOptionC() != null ? q.getOptionC() : "");
+            qMap.put("optionD", q.getOptionD() != null ? q.getOptionD() : "");
+            qList.add(qMap);
+        }
+
+        return Map.of(
+                "id", exam.getId(),
+                "title", exam.getTitle(),
+                "description", exam.getDescription(),
+                "questions", qList
+        );
+    }
+
+    // ---------------------------
+    // Calculate score
+    // ---------------------------
+    private int calculateScore(Exam exam, Map<String, String> answers) {
+        List<Question> questions = questionRepository.findByExamId(exam.getId());
+        if (questions.isEmpty()) return 0;
+
+        long correct = questions.stream()
+                .filter(q -> {
+                    String ans = answers.get(String.valueOf(q.getId()));
+                    return ans != null && ans.equalsIgnoreCase(q.getCorrectAnswer());
                 })
-                .collect(Collectors.toList());
+                .count();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("examId", exam.getId());
-        response.put("title", exam.getTitle());
-        response.put("description", exam.getDescription());
-        response.put("questions", questionList);
+        return (int) Math.round((double) correct / questions.size() * 100);
+    }
 
-        return response;
+    // ---------------------------
+    // Convert answers → JSON string
+    // ---------------------------
+    private String convertAnswersToJson(Map<String, String> answers) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(answers);
+        } catch (Exception e) {
+            return "{}";
+        }
+    }
+
+    // ---------------------------
+    // Save Answer entities
+    // ---------------------------
+    private void saveAnswersEntities(Submission submission, Map<String, String> answers) {
+        answers.forEach((qidStr, userAns) -> {
+            Long qid = Long.valueOf(qidStr);
+            Question q = questionRepository.findById(qid).orElse(null);
+            if (q == null) return;
+
+            Answer ans = Answer.builder()
+                    .submission(submission)
+                    .question(q)
+                    .text(userAns)
+                    .build();
+            answerRepository.save(ans);
+        });
     }
 }

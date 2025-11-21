@@ -1,31 +1,29 @@
-// src/pages/candidate/ExamPage.jsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../../api/api";
 import "./Candidate.css";
 
 export default function ExamPage() {
-  const { examId } = useParams();      
-  const navigate = useNavigate();
+  const { examId } = useParams();
   const [questions, setQuestions] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
+  const [score, setScore] = useState(null);
+  const [canTakeExam, setCanTakeExam] = useState(false);
 
   const userId = localStorage.getItem("userId");
 
-  // 1️⃣ Load đề thi từ backend
+  // Load exam
   useEffect(() => {
     if (!examId) return;
 
-    setLoading(true);
     api.get(`/exams/start/${examId}`)
       .then(res => {
+        setCanTakeExam(true); // backend đã APPROVED
         setTitle(res.data.title);
         setDescription(res.data.description);
-
-        // map câu hỏi về format dễ dùng cho frontend
         const qList = res.data.questions.map(q => ({
           id: q.id,
           text: q.content,
@@ -33,46 +31,47 @@ export default function ExamPage() {
             { label: "A", text: q.optionA },
             { label: "B", text: q.optionB },
             { label: "C", text: q.optionC },
-            { label: "D", text: q.optionD },
-          ],
-          correctAnswer: q.correctAnswer
+            { label: "D", text: q.optionD }
+          ]
         }));
         setQuestions(qList);
       })
       .catch(err => {
         console.error("Failed to load exam:", err);
-        alert("Không thể tải bài thi!");
+        setCanTakeExam(false);
+        alert(err.response?.data || "Bạn chưa thể làm bài thi online.");
       })
       .finally(() => setLoading(false));
   }, [examId]);
 
-  // 2️⃣ Xử lý chọn đáp án
+  // Chọn đáp án
   const handleChange = (qid, value) =>
     setAnswers(prev => ({ ...prev, [qid]: value }));
 
-  // 3️⃣ Nộp bài
+  // Nộp bài
   const handleSubmit = () => {
-    // kiểm tra câu chưa trả lời
+    if (!canTakeExam) return alert("Bạn chưa được phép làm bài thi.");
+
     const unanswered = questions.filter(q => !answers[q.id]);
     if (unanswered.length > 0) {
       alert("Bạn phải trả lời tất cả câu hỏi!");
       return;
     }
 
-    // chuẩn dữ liệu gửi lên backend: { questionId: "A/B/C/D" }
-    const payload = {};
+    const payload = { answers: {} };
     questions.forEach(q => {
-      payload[q.id] = answers[q.id];
+      payload.answers[q.id.toString()] = answers[q.id];
     });
 
     api.post(`/exams/submit/${userId}/${examId}`, payload)
       .then(res => {
-        alert(`Nộp bài thành công! Điểm của bạn: ${res.data.score}`);
-        navigate("/results");
+        const submittedScore = res.data.score;
+        setScore(submittedScore);
+        alert(`🎉 Bạn đã nộp bài!\nĐiểm của bạn: ${submittedScore}`);
       })
       .catch(err => {
         console.error("Submit failed:", err);
-        alert("Không thể nộp bài!");
+        alert(err.response?.data || "Không thể nộp bài!");
       });
   };
 
@@ -83,7 +82,11 @@ export default function ExamPage() {
       <h2>{title}</h2>
       <p>{description}</p>
 
-      {questions.map(q => (
+      {!canTakeExam && (
+        <p>Bạn chưa được phép làm bài thi online. Hãy nộp hồ sơ nâng bậc và chờ duyệt.</p>
+      )}
+
+      {canTakeExam && questions.map(q => (
         <div key={q.id} className="exam-question">
           <p><b>{q.text}</b></p>
           {q.options.map(opt => (
@@ -101,9 +104,13 @@ export default function ExamPage() {
         </div>
       ))}
 
-      <button className="candidate-btn" onClick={handleSubmit}>
-        Nộp bài
-      </button>
+      {canTakeExam && (
+        <button className="candidate-btn" onClick={handleSubmit}>
+          Nộp bài
+        </button>
+      )}
+
+      {score !== null && <p>Điểm của bạn: <b>{score}</b></p>}
     </div>
   );
 }

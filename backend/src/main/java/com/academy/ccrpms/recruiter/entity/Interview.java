@@ -8,10 +8,17 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name = "interviews")
 public class Interview {
 
     public enum InterviewStatus {
-        SCHEDULED, COMPLETED, PENDING, INTERVIEWING, APPROVED, REJECTED, HIRED
+        SCHEDULED,
+        COMPLETED,
+        PENDING,
+        INTERVIEWING,
+        APPROVED,
+        REJECTED,
+        HIRED
     }
 
     @Id
@@ -19,16 +26,23 @@ public class Interview {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "application_id")
     private com.academy.ccrpms.application.entity.Application application;
 
+    // 🔥 SỬA CHUẨN – KHỚP CỘT TRONG DATABASE
+    @Column(name = "interview_date", nullable = false)
     private LocalDateTime interviewDate;
+
     private String location;
+
     private String comment;
-    private Double score;       // score interview
-    private Double scoreExam;   // score exam
+
+    private Double score;        // interview score
+    private Double scoreExam;    // exam score
+
     @Enumerated(EnumType.STRING)
     private InterviewStatus status;
-    @Column(name = "note")
-    private String note;  // comment của recruiter
 
+    @Column(name = "note")
+    private String note;  // recruiter's note
 }

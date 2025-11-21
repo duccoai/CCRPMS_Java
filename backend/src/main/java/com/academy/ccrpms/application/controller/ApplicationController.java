@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,10 +26,10 @@ public class ApplicationController {
      *
      * @param userDetails thông tin user hiện tại
      * @param jobId       id của job muốn nộp hồ sơ
-     * @return ApplicationResponseDTO của hồ sơ vừa nộp
+     * @return ApplicationResponseDTO của hồ sơ vừa nộp hoặc thông báo lỗi thân thiện
      */
     @PostMapping("/submit/{jobId}")
-    public ResponseEntity<ApplicationResponseDTO> submit(
+    public ResponseEntity<?> submit(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long jobId
     ) {
@@ -36,10 +37,15 @@ public class ApplicationController {
             return ResponseEntity.status(401).build();
         }
 
-        Application app = applicationService.submitApplication(userDetails.getId(), jobId);
-        ApplicationResponseDTO dto = ApplicationResponseDTO.fromEntity(app);
-
-        return ResponseEntity.ok(dto);
+        try {
+            Application app = applicationService.submitApplication(userDetails.getId(), jobId);
+            ApplicationResponseDTO dto = ApplicationResponseDTO.fromEntity(app);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException ex) {
+            // Trả về thông báo thân thiện nếu nộp trùng hoặc lỗi khác
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", ex.getMessage()));
+        }
     }
 
     /**
@@ -63,5 +69,19 @@ public class ApplicationController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);
+    }
+
+    /**
+     * Lấy kết quả hồ sơ (kèm điểm exam) của một candidate cho recruiter.
+     *
+     * @param candidateId ID của candidate
+     * @return danh sách kết quả ứng tuyển kèm điểm thi
+     */
+    @GetMapping("/user/{candidateId}/results")
+    public ResponseEntity<List<Map<String, Object>>> getCandidateResults(
+            @PathVariable Long candidateId
+    ) {
+        List<Map<String, Object>> results = applicationService.getApplicationResults(candidateId);
+        return ResponseEntity.ok(results);
     }
 }

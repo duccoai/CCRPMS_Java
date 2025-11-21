@@ -12,12 +12,14 @@ import com.academy.ccrpms.recruiter.entity.Interview;
 import com.academy.ccrpms.recruiter.service.RecruiterService;
 import com.academy.ccrpms.user.entity.User;
 import com.academy.ccrpms.user.repository.UserRepository;
+import com.academy.ccrpms.promotion.entity.PromotionApplication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,7 +50,7 @@ public class RecruiterController {
         return ResponseEntity.ok(updated);
     }
 
-    // @PostMapping("/interviews/schedule")
+    // 3️⃣ Tạo lịch phỏng vấn
     @PostMapping("/interviews/schedule")
     public ResponseEntity<Interview> scheduleInterview(@RequestBody InterviewScheduleDTO dto) {
         Interview interview = dto.toEntity();
@@ -56,6 +58,7 @@ public class RecruiterController {
         return ResponseEntity.ok(saved);
     }
 
+    // 4️⃣ Cập nhật lịch phỏng vấn
     @PutMapping("/interviews")
     public ResponseEntity<Interview> updateInterview(@RequestBody InterviewUpdateDTO dto) {
         Interview interview = dto.toEntity();
@@ -63,19 +66,24 @@ public class RecruiterController {
         return ResponseEntity.ok(updated);
     }
 
+    // 5️⃣ Chấm điểm phỏng vấn
     @PostMapping("/interviews/{id}/score")
-    public ResponseEntity<Interview> scoreInterview(@PathVariable Long id, @RequestParam Double score) {
+    public ResponseEntity<Interview> scoreInterview(
+            @PathVariable Long id,
+            @RequestParam Double score
+    ) {
         Interview updated = recruiterService.scoreInterview(id, score);
         return ResponseEntity.ok(updated);
     }
 
+    // 6️⃣ Chấm điểm bài thi của candidate
     @PostMapping("/submissions/{id}/score")
     public ResponseEntity<Void> scoreSubmission(@PathVariable Long id, @RequestParam Double score) {
         recruiterService.scoreSubmission(id, score);
         return ResponseEntity.ok().build();
     }
 
-    // 6️⃣ Lấy danh sách jobs
+    // 7️⃣ Lấy danh sách jobs
     @GetMapping("/jobs")
     public ResponseEntity<List<JobResponseDTO>> getMyJobs(Authentication authentication) {
         CustomUserDetails cud = (CustomUserDetails) authentication.getPrincipal();
@@ -89,7 +97,7 @@ public class RecruiterController {
         return ResponseEntity.ok(dtos);
     }
 
-    // 7️⃣ Tạo job mới
+    // 8️⃣ Tạo job mới
     @PostMapping("/jobs")
     public ResponseEntity<?> createJob(Authentication authentication, @RequestBody JobRequestDTO dto) {
         if (dto == null || dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
@@ -107,7 +115,7 @@ public class RecruiterController {
         job.setDescription(dto.getDescription());
         job.setLocation(dto.getLocation());
         job.setSalaryRange(dto.getSalaryRange());
-        if (dto.getStatus() != null) job.setStatus(dto.getStatus());
+        job.setStatus(dto.getStatus());
         job.setRecruiter(recruiter);
 
         Job saved = jobRepository.save(job);
@@ -115,14 +123,15 @@ public class RecruiterController {
         return ResponseEntity.ok(out);
     }
 
-    // 8️⃣ Chấm điểm phỏng vấn
-    @PostMapping("/interviews/{id}/score")
-    public ResponseEntity<Interview> scoreInterview(
-            @PathVariable Long id,
-            @RequestParam Double score
-    ) {
-        Interview updated = recruiterService.scoreInterview(id, score);
-        return ResponseEntity.ok(updated);
+    // 9️⃣ Lấy danh sách promotion applications (mới)
+    @GetMapping("/promotions")
+    public ResponseEntity<?> getPromotionApplications() {
+        try {
+            List<PromotionApplication> promotions = recruiterService.getAllPromotionApplications();
+            return ResponseEntity.ok(promotions);
+        } catch (Exception e) {
+            e.printStackTrace(); // log lỗi server
+            return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
+        }
     }
-
 }

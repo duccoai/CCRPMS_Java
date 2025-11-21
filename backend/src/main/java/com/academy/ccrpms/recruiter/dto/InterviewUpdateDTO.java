@@ -2,6 +2,8 @@ package com.academy.ccrpms.recruiter.dto;
 
 import java.time.OffsetDateTime;
 
+import com.academy.ccrpms.recruiter.entity.Interview;
+
 public class InterviewUpdateDTO {
     private Long applicationId;
     private String status;
@@ -36,4 +38,8 @@ public class InterviewUpdateDTO {
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+    public Interview toEntity() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'toEntity'");
+    }
 }

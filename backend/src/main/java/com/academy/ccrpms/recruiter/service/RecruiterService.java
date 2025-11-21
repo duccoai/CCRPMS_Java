@@ -5,6 +5,9 @@ import com.academy.ccrpms.application.entity.ApplicationStatus;
 import com.academy.ccrpms.application.repository.ApplicationRepository;
 import com.academy.ccrpms.exam.entity.Submission;
 import com.academy.ccrpms.exam.repository.SubmissionRepository;
+import com.academy.ccrpms.notification.service.NotificationService;
+import com.academy.ccrpms.promotion.entity.PromotionApplication;
+import com.academy.ccrpms.promotion.repository.PromotionApplicationRepository;
 import com.academy.ccrpms.recruiter.dto.ApplicationSummaryDTO;
 import com.academy.ccrpms.recruiter.entity.Interview;
 import com.academy.ccrpms.recruiter.repository.InterviewRepository;
@@ -22,7 +25,11 @@ public class RecruiterService {
     private final ApplicationRepository applicationRepository;
     private final InterviewRepository interviewRepository;
     private final SubmissionRepository submissionRepository;
+    private final PromotionApplicationRepository promotionApplicationRepository;
 
+    private final NotificationService notificationService;
+
+    // -------------------- Application --------------------
     public List<ApplicationSummaryDTO> getAllApplications(Long recruiterId) {
         List<Application> apps = applicationRepository.findByJob_Recruiter_Id(recruiterId);
 
@@ -53,7 +60,6 @@ public class RecruiterService {
         app.setStatus(ApplicationStatus.valueOf(newStatus));
         Application saved = applicationRepository.save(app);
 
-        // Trả về DTO
         return ApplicationSummaryDTO.builder()
                 .applicationId(saved.getId())
                 .candidateUsername(saved.getCandidate() != null ? saved.getCandidate().getUsername() : "N/A")
@@ -64,11 +70,24 @@ public class RecruiterService {
                 .build();
     }
 
+    // -------------------- Interview --------------------
     public Interview scheduleInterview(Long applicationId, Interview interview) {
-        Application app = applicationRepository.findById(applicationId)
+        Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
-        interview.setApplication(app);
-        return interviewRepository.save(interview);
+
+        interview.setApplication(application);
+        Interview savedInterview = interviewRepository.save(interview);
+
+        // 🔔 Gửi thông báo cho ứng viên
+        notificationService.sendNotification(
+                application.getCandidate().getId(),
+                "Lịch phỏng vấn mới",
+                "Ngày: " + interview.getInterviewDate() +
+                        "\nĐịa điểm: " + interview.getLocation() +
+                        "\nGhi chú: " + interview.getNote()
+        );
+
+        return savedInterview;
     }
 
     public Interview updateInterview(Interview interview) {
@@ -76,7 +95,7 @@ public class RecruiterService {
                 .orElseThrow(() -> new RuntimeException("Interview not found"));
         existing.setInterviewDate(interview.getInterviewDate());
         existing.setLocation(interview.getLocation());
-        existing.setNotes(interview.getNotes());
+        existing.setNote(interview.getNote());
         return interviewRepository.save(existing);
     }
 
@@ -87,10 +106,16 @@ public class RecruiterService {
         return interviewRepository.save(interview);
     }
 
+    // -------------------- Submission --------------------
     public void scoreSubmission(Long submissionId, double score) {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
         submission.setScore(score);
         submissionRepository.save(submission);
+    }
+
+    // -------------------- Promotion --------------------
+    public List<PromotionApplication> getAllPromotionApplications() {
+        return promotionApplicationRepository.findAll();
     }
 }

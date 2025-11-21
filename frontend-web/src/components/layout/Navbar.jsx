@@ -30,11 +30,13 @@ export default function Navbar() {
             <Link to="/recruiter/dashboard" style={{ color: 'white', marginLeft: 8 }}>Recruiter</Link>
             <Link to="/recruiter/jobs" style={{ color: 'white', marginLeft: 8 }}>Manage Jobs</Link>
             <Link to="/recruiter/applications" style={{ color: 'white', marginLeft: 8 }}>Applications</Link>
+            <Link to="/recruiter/promotions" style={{ color: 'white', marginLeft: 8 }}>Promotion Applications</Link>
           </>
         ) : null }
 
         {/* candidate links */}
         <Link to="/jobs" style={{ color: 'white', marginLeft: 8 }}>Jobs</Link>
+        <Link to="/promotion/status" style={{ color: 'white', marginLeft: 8 }}>Hồ sơ nâng bậc</Link>
       </div>
 
       <div className="flex items-center gap-4">

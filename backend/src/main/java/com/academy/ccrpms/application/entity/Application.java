@@ -1,6 +1,7 @@
 package com.academy.ccrpms.application.entity;
 
 import com.academy.ccrpms.common.BaseEntity;
+import com.academy.ccrpms.exam.entity.Submission;
 import com.academy.ccrpms.job.entity.Job;
 import com.academy.ccrpms.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -41,4 +42,17 @@ public class Application extends BaseEntity {
     // URL CV (nếu có)
     private String cvUrl;
 
+    // -----------------------------------
+    // THÊM SCORE EXAM
+    // -----------------------------------
+    @Column(name = "score_exam")
+    private Double scoreExam;     // null = chưa thi
+
+    // -----------------------------------
+    // OPTIONAL: LIÊN KẾT VỚI SUBMISSION
+    // Application <--> Submission (1-1)
+    // -----------------------------------
+    @OneToOne(mappedBy = "application")
+    @JsonIgnoreProperties({"application"})
+    private Submission submission;
 }

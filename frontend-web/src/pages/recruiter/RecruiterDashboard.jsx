@@ -54,6 +54,7 @@ export default function RecruiterDashboard() {
           <li><Link to="/recruiter/dashboard">Dashboard</Link></li>
           <li><Link to="/recruiter/applications">Applications</Link></li>
           <li><Link to="/recruiter/jobs">Jobs</Link></li>
+          <li><Link to="/recruiter/promotions">Promotion Applications</Link></li>
         </ul>
       </aside>
 
